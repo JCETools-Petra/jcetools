@@ -1,0 +1,1 @@
+[2025-09-20 11:31:31] Target: 6285157781148, Response: {"detail":"success! message in queue","id":["121415379"],"process":"pending","quota":{"6281945300897":{"details":"deduced from total quota","quota":1397,"remaining":1396,"used":1}},"requestid":100152092,"status":true,"target":["6285157781148"]}
