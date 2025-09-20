@@ -1,0 +1,6 @@
+[17-Sep-2025 19:55:20 Asia/Jakarta] PHP Warning:  Undefined array key "PAYLOAD_SECRET_KEY" in /home/apsx2353/public_html/jcetools.my.id/api/session_login.php on line 18
+[17-Sep-2025 19:55:20 Asia/Jakarta] PHP Fatal error:  Uncaught TypeError: decrypt_payload(): Argument #2 ($secret_key) must be of type string, null given, called in /home/apsx2353/public_html/jcetools.my.id/api/session_login.php on line 29 and defined in /home/apsx2353/public_html/jcetools.my.id/api/crypto_helper.php:38
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/api/session_login.php(29): decrypt_payload()
+#1 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/api/crypto_helper.php on line 38

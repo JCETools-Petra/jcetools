@@ -1,0 +1,2 @@
+# Alihkan semua permintaan dari root ke folder /hwid/
+RewriteEngine On
