@@ -1,7 +1,8 @@
 <?php
-// Pastikan semua error tersembunyi di lingkungan produksi
-// error_reporting(0);
-// ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/error_log_pembayaran.txt');
 
 // Load .env dan koneksi database
 require __DIR__ . '/vendor/autoload.php';
@@ -99,7 +100,8 @@ if ($tipe_order === 'baru') {
     // Menyesuaikan dengan nama kolom yang ada di tabel Anda
     $stmt = $conn->prepare("INSERT INTO `transaksi` (`order_id`, `nama_pembeli`, `nomor_whatsapp`, `license_username`, `license_password`, `produk_id`, `tipe_order`, `jumlah_bulan`, `harga`, `status_pembayaran`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $status_pembayaran = 'pending';
-    $stmt->bind_param('sssssisiss', $order_id, $nama_pembeli, $nomor_whatsapp, $license_username, $license_password, $produk_id, $tipe_order, $jumlah_bulan, $harga, $status_pembayaran);
+    // PERBAIKAN: Ubah 'sssssisiss' menjadi 'sssssiissi'
+    $stmt->bind_param('sssssiissi', $order_id, $nama_pembeli, $nomor_whatsapp, $license_username, $license_password, $produk_id, $tipe_order, $jumlah_bulan, $harga, $status_pembayaran);
     $stmt->execute();
     $stmt->close();
 
@@ -116,7 +118,8 @@ if ($tipe_order === 'baru') {
     // Menyesuaikan dengan nama kolom yang ada di tabel Anda
     $stmt = $conn->prepare("INSERT INTO `transaksi` (`order_id`, `tipe_order`, `renewal_type`, `produk_id`, `jumlah_bulan`, `license_username`, `hwid`, `harga`, `status_pembayaran`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $status_pembayaran = 'pending';
-    $stmt->bind_param('ssssissss', $order_id, $tipe_order, $renewal_type, $produk_id, $jumlah_bulan, $license_username, $hwid, $harga, $status_pembayaran);
+    // PERBAIKAN: Ubah 'ssssissss' menjadi 'sssiisiss'
+    $stmt->bind_param('sssiisiss', $order_id, $tipe_order, $renewal_type, $produk_id, $jumlah_bulan, $license_username, $hwid, $harga, $status_pembayaran);
     $stmt->execute();
     $stmt->close();
 }

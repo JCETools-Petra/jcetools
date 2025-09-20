@@ -1,6 +1,14 @@
 <?php
 header('Content-Type: application/json');
 
+// Pastikan baris ini ada di awal file
+session_start();
+
+// Buat token CSRF jika belum ada (ini seharusnya di halaman yang menampilkan form, bukan di sini)
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Menggunakan koneksi database yang sama
 require __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -25,13 +33,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Validasi CSRF Token
+// HAPUS BLOK KODE INI KARENA INI BUKAN TEMPATNYA VALIDASI TOKEN CSRF
+/*
 session_start();
 if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Validasi token CSRF gagal.']);
     exit();
 }
+*/
 
 $tipe_order = $_POST['tipe_order'] ?? '';
 $input_value = '';

@@ -1,1 +1,1 @@
-[20-Sep-2025 11:30:54 Asia/Jakarta] PHP Warning:  session_set_cookie_params(): Session cookie parameters cannot be changed when a session is active in /home/apsx2353/public_html/jcetools.my.id/index.php on line 57
+[20-Sep-2025 13:52:58 Asia/Jakarta] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in /home/apsx2353/public_html/jcetools.my.id/index.php on line 83

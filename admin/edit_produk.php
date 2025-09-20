@@ -20,11 +20,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $deskripsi = $_POST['deskripsi'] ?? '';
     $harga = filter_input(INPUT_POST, 'harga', FILTER_VALIDATE_INT);
     $durasi_hari = filter_input(INPUT_POST, 'durasi_hari', FILTER_VALIDATE_INT);
+    $download_link = filter_input(INPUT_POST, 'download_link', FILTER_VALIDATE_URL);
     $is_active = isset($_POST['is_active']) ? 1 : 0;
 
     if (!empty($nama_produk) && $harga > 0 && $durasi_hari > 0) {
-        $stmt = $conn->prepare("UPDATE produk SET nama_produk=?, deskripsi=?, harga=?, durasi_hari=?, is_active=? WHERE id=?");
-        $stmt->bind_param("ssiiii", $nama_produk, $deskripsi, $harga, $durasi_hari, $is_active, $id);
+        $stmt = $conn->prepare("UPDATE produk SET nama_produk=?, deskripsi=?, harga=?, durasi_hari=?, download_link=?, is_active=? WHERE id=?");
+        $stmt->bind_param("ssiissi", $nama_produk, $deskripsi, $harga, $durasi_hari, $download_link, $is_active, $id);
         
         if ($stmt->execute()) {
             header('Location: dashboard.php?status=produk_update_sukses');
@@ -129,6 +130,10 @@ if (!$produk) {
                 <label for="durasi_hari" class="form-label">Durasi Aktif (Hari)</label>
                 <input type="number" class="form-control" id="durasi_hari" name="durasi_hari" value="<?php echo $produk['durasi_hari']; ?>" required>
             </div>
+        </div>
+        <div class="mb-3">
+            <label for="download_link" class="form-label">URL Download</label>
+            <input type="url" class="form-control" id="download_link" name="download_link" value="<?php echo htmlspecialchars($produk['download_link'] ?? ''); ?>">
         </div>
         <div class="form-check form-switch mb-4">
             <input class="form-check-input" type="checkbox" role="switch" id="is_active" name="is_active" <?php if ($produk['is_active']) echo 'checked'; ?>>
