@@ -169,6 +169,16 @@ try {
                 $stmt_lic->execute();
                 $stmt_lic->close();
                 
+                // --- TAMBAHKAN KODE INI ---
+                // Ambil nomor WA dari tabel licensed_users
+                $stmt_get_phone = $conn->prepare("SELECT phone_number FROM licensed_users WHERE username = ?");
+                $stmt_get_phone->bind_param('s', $transaksi['license_username']);
+                $stmt_get_phone->execute();
+                $user_phone_info = $stmt_get_phone->get_result()->fetch_assoc();
+                $stmt_get_phone->close();
+                $nomor_wa_tujuan = $user_phone_info['phone_number'] ?? $nomor_wa_tujuan; // Ambil dari DB, fallback ke data transaksi
+                // --- SELESAI PENAMBAHAN ---
+            
                 // Ambil link download berdasarkan produk milik user
                 $stmt_user_product = $conn->prepare(
                     "SELECT p.download_link 
@@ -181,8 +191,8 @@ try {
                 $user_product = $stmt_user_product->get_result()->fetch_assoc();
                 $stmt_user_product->close();
                 $download_link_user = $user_product['download_link'] ?? '#';
-
-                $pesan_wa = "✅ *Perpanjangan Lisensi Berhasil!*\n\nLisensi *{$nama_produk}* untuk akun '{$transaksi['license_username']}' telah diperpanjang selama *{$jumlah_bulan} bulan*.\n\nSilakan unduh update launcher (jika ada) di:\n{$download_link_user}";
+            
+                $pesan_wa = "✅ *Perpanjangan Lisensi Berhasil!*\n\nLisensi *{$nama_produk}* untuk akun '{$transaksi['license_username']}' telah diperpanjang selama *{$jumlah_bulan} bulan*.\n\nSilakan unduh update launcher di:\n{$download_link_user}";
             }
         }
         

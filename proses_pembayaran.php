@@ -1,6 +1,6 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
-require __DIR__ . '/core/session_starter.php'; // Mulai sesi dengan cara yang benar
+require __DIR__ . '/core/session_starter.php';
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -9,8 +9,11 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 header('Content-Type: application/json');
 
-// Validasi CSRF Token
-if (empty($_SESSION['csrf_token']) || !isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+// REVISI: Validasi CSRF dengan metode Double Submit Cookie agar konsisten
+$token_from_header = isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? $_SERVER['HTTP_X_CSRF_TOKEN'] : '';
+$token_from_cookie = isset($_COOKIE['X-CSRF-TOKEN']) ? $_COOKIE['X-CSRF-TOKEN'] : '';
+
+if (empty($token_from_header) || empty($token_from_cookie) || !hash_equals($token_from_cookie, $token_from_header)) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Validasi keamanan gagal. Silakan muat ulang halaman.']);
     exit();
@@ -21,7 +24,9 @@ $tipe_order = filter_input(INPUT_POST, 'tipe_order', FILTER_SANITIZE_SPECIAL_CHA
 $nama_pembeli = filter_input(INPUT_POST, 'nama_pembeli', FILTER_SANITIZE_SPECIAL_CHARS);
 $nomor_whatsapp = filter_input(INPUT_POST, 'nomor_whatsapp', FILTER_SANITIZE_SPECIAL_CHARS);
 $license_username = filter_input(INPUT_POST, 'license_username', FILTER_SANITIZE_SPECIAL_CHARS);
-$license_password = $_POST['license_password'] ?? '';
+$raw_password = $_POST['license_password'] ?? '';
+// HASH PASSWORD SEBELUM DISIMPAN!
+$license_password = password_hash($raw_password, PASSWORD_BCRYPT);
 $hwid = filter_input(INPUT_POST, 'hwid', FILTER_SANITIZE_SPECIAL_CHARS);
 $renewal_type = filter_input(INPUT_POST, 'renewal_type', FILTER_SANITIZE_SPECIAL_CHARS);
 $produk_id = filter_input(INPUT_POST, 'produk_id', FILTER_VALIDATE_INT);
@@ -37,7 +42,6 @@ if ($tipe_order === 'baru' && (empty($nama_pembeli) || empty($nomor_whatsapp) ||
     exit();
 }
 
-// Atur koneksi database
 $conn = new mysqli($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
 if ($conn->connect_error) {
     http_response_code(500);
@@ -45,7 +49,6 @@ if ($conn->connect_error) {
     exit();
 }
 
-// Ambil data produk
 $stmt = $conn->prepare("SELECT nama_produk, harga FROM produk WHERE id = ?");
 $stmt->bind_param('i', $produk_id);
 $stmt->execute();
@@ -64,7 +67,6 @@ if ($tipe_order === 'baru') {
     $harga = (int)$produk['harga'];
     $item_details[] = ['id' => $produk_id, 'price' => $harga, 'quantity' => 1, 'name' => $produk['nama_produk']];
     
-    // Simpan data order baru ke tabel `transaksi`
     $stmt = $conn->prepare("INSERT INTO `transaksi` (order_id, nama_pembeli, nomor_whatsapp, license_username, license_password, produk_id, tipe_order, jumlah_bulan, harga, status_pembayaran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $status_pembayaran = 'pending';
     $jumlah_bulan_baru = 1;
@@ -74,19 +76,17 @@ if ($tipe_order === 'baru') {
     $harga = (int)$produk['harga'] * (int)$jumlah_bulan;
     $item_details[] = ['id' => $produk_id, 'price' => (int)$produk['harga'], 'quantity' => (int)$jumlah_bulan, 'name' => $produk['nama_produk'] . ' (' . $jumlah_bulan . ' Bulan)'];
 
-    // Simpan data perpanjangan ke tabel `transaksi`
     $stmt = $conn->prepare("INSERT INTO `transaksi` (order_id, tipe_order, renewal_type, produk_id, jumlah_bulan, license_username, hwid, harga, status_pembayaran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $status_pembayaran = 'pending';
     $stmt->bind_param('sssiisiss', $order_id, $tipe_order, $renewal_type, $produk_id, $jumlah_bulan, $license_username, $hwid, $harga, $status_pembayaran);
 }
 
 if (!$stmt->execute()) {
-    echo json_encode(['success' => false, 'message' => 'Gagal menyimpan data transaksi.']);
+    echo json_encode(['success' => false, 'message' => 'Gagal menyimpan data transaksi: ' . $stmt->error]);
     exit();
 }
 $stmt->close();
 
-// Konfigurasi Midtrans
 \Midtrans\Config::$serverKey = $_ENV['MIDTRANS_SERVER_KEY'];
 \Midtrans\Config::$isProduction = ($_ENV['APP_ENV'] === 'production');
 \Midtrans\Config::$isSanitized = true;
