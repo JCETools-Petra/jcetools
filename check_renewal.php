@@ -1,28 +1,15 @@
 <?php
+require __DIR__ . '/core/session_starter.php'; // Mulai sesi dengan cara yang benar
 header('Content-Type: application/json');
 
-// Pastikan baris ini ada di awal file
-session_start();
-
-// Buat token CSRF jika belum ada (ini seharusnya di halaman yang menampilkan form, bukan di sini)
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-// Menggunakan koneksi database yang sama
 require __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-$servername = $_ENV['DB_HOST'];
-$username_db = $_ENV['DB_USER'];
-$password_db = $_ENV['DB_PASS'];
-$dbname = $_ENV['DB_NAME'];
-
-$conn = new mysqli($servername, $username_db, $password_db, $dbname);
-if ($conn->connect_error) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Koneksi database gagal.']);
+// Validasi CSRF Token
+if (empty($_SESSION['csrf_token']) || !isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Sesi tidak valid atau telah kedaluwarsa. Silakan muat ulang halaman.']);
     exit();
 }
 
@@ -33,66 +20,60 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// HAPUS BLOK KODE INI KARENA INI BUKAN TEMPATNYA VALIDASI TOKEN CSRF
-/*
-session_start();
-if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Validasi token CSRF gagal.']);
+// Atur koneksi database
+$conn = new mysqli($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Koneksi database gagal.']);
     exit();
 }
-*/
 
 $tipe_order = $_POST['tipe_order'] ?? '';
-$input_value = '';
-$check_table = '';
-$check_column = '';
+$response = ['success' => false, 'message' => 'Tipe order tidak valid.'];
 
-// Tentukan tabel dan kolom berdasarkan tipe order
-switch ($tipe_order) {
-    case 'perpanjang-hwid':
-        $input_value = $_POST['hwid'] ?? '';
-        // Perbaikan: HWID harus dienkripsi sebelum dicari
-        // ASUMSI: Fungsi enkripsi berada di file api/crypto_helper.php
-        require_once __DIR__ . '/api/encrypt.php';
-        $input_value = encrypt_hwid($input_value);
-        $check_table = 'user_jce';
-        $check_column = 'hwid_encrypted';
-        break;
-    case 'perpanjang-paket':
-        $input_value = $_POST['username'] ?? '';
-        $check_table = 'licensed_users';
-        $check_column = 'username';
-        break;
-    default:
-        echo json_encode(['success' => false, 'message' => 'Tipe order tidak valid.']);
-        exit();
+if ($tipe_order === 'perpanjang-paket') {
+    $username = $_POST['username'] ?? '';
+    if (empty($username)) {
+        $response['message'] = 'Username tidak boleh kosong.';
+    } else {
+        $stmt = $conn->prepare("SELECT p.nama_produk, p.harga FROM licensed_users u JOIN produk p ON u.produk_id = p.id WHERE u.username = ? AND p.is_active = TRUE");
+        $stmt->bind_param('s', $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $data = $result->fetch_assoc();
+            $response = ['success' => true, 'message' => 'Username ditemukan. Paket: ' . htmlspecialchars($data['nama_produk']), 'harga' => $data['harga']];
+        } else {
+            $response['message'] = 'Username tidak ditemukan atau paket lisensi sudah tidak aktif.';
+        }
+        $stmt->close();
+    }
+} else if ($tipe_order === 'perpanjang-hwid') {
+    $hwid = $_POST['hwid'] ?? '';
+    if (empty($hwid)) {
+        $response['message'] = 'HWID tidak boleh kosong.';
+    } else {
+        $key_string = "JCETOOLS-1830"; $key = str_pad($key_string, 32, "\0", STR_PAD_RIGHT);
+        $iv_hex = "1234567890abcdef1234567800000000"; $iv = hex2bin($iv_hex);
+        $ciphertext_raw = openssl_encrypt($hwid, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+        $hwid_encrypted = bin2hex($ciphertext_raw);
+
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM user_jce WHERE hwid_encrypted = ?");
+        $stmt->bind_param('s', $hwid_encrypted);
+        $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
+        $stmt->close();
+
+        if ($count > 0) {
+            $response = ['success' => true, 'message' => 'HWID ditemukan dan valid.'];
+        } else {
+            $response['message'] = 'HWID yang Anda masukkan tidak terdaftar.';
+        }
+    }
 }
 
-if (empty($input_value)) {
-    echo json_encode(['success' => false, 'message' => 'Input tidak boleh kosong.']);
-    exit();
-}
-
-// Gunakan prepared statement untuk mencegah SQL Injection
-$sql = "SELECT COUNT(*) FROM `{$check_table}` WHERE `{$check_column}` = ?";
-$stmt = $conn->prepare($sql);
-if (!$stmt) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Gagal menyiapkan statement.']);
-    exit();
-}
-
-$stmt->bind_param("s", $input_value);
-$stmt->execute();
-$stmt->bind_result($count);
-$stmt->fetch();
-$stmt->close();
 $conn->close();
-
-if ($count > 0) {
-    echo json_encode(['success' => true, 'message' => 'Akun ditemukan.']);
-} else {
-    echo json_encode(['success' => false, 'message' => "Maaf, input yang Anda masukkan tidak terdaftar. Silakan periksa kembali."]);
-}
+echo json_encode($response);
 ?>

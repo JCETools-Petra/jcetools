@@ -1,35 +1,27 @@
 <?php
-// Load .env dan koneksi database
+// Load .env, vendor, dan mulai sesi secara konsisten
 require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/core/session_starter.php';
+
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-// Sembunyikan error di environment produksi untuk keamanan
-// error_reporting(0);
-// ini_set('display_errors', 0);
+// PERBAIKAN CSP: Tambahkan header untuk mengizinkan skrip Midtrans
+$csp = "script-src 'self' https://app.sandbox.midtrans.com https://cdn.jsdelivr.net https://fonts.googleapis.com 'unsafe-eval'; ";
+$csp .= "style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com 'unsafe-inline'; ";
+$csp .= "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; ";
+$csp .= "connect-src 'self' https://jcetools.my.id; "; // Ganti dengan domain Anda jika perlu
+header("Content-Security-Policy: " . $csp);
 
-// Perbaikan: Konfigurasi cookie sesi yang aman HARUS sebelum session_start()
-$samesite = 'Lax'; // or 'Strict'
-if (PHP_VERSION_ID >= 70300) {
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path' => '/',
-        'domain' => $_SERVER['HTTP_HOST'],
-        'secure' => true, // Gunakan hanya di HTTPS
-        'httponly' => true,
-        'samesite' => $samesite
-    ]);
-} else {
-    // Fallback untuk versi PHP lama
-    session_set_cookie_params(0, '/; SameSite=' . $samesite, $_SERVER['HTTP_HOST'], true, true);
-}
-
-session_start();
-
-// Perbaikan: Regenerasi ID sesi untuk mencegah serangan session fixation
+// Regenerasi ID sesi untuk mencegah serangan session fixation
 if (!isset($_SESSION['initiated'])) {
     session_regenerate_id(true);
     $_SESSION['initiated'] = true;
+}
+
+// Buat CSRF token jika belum ada
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 $servername = $_ENV['DB_HOST'];
@@ -40,17 +32,15 @@ $dbname = $_ENV['DB_NAME'];
 // Atur koneksi database
 $conn = new mysqli($servername, $username_db, $password_db, $dbname);
 if ($conn->connect_error) {
-    // Jika koneksi gagal, tampilkan halaman maintenance
     include('maintenance.php');
     exit();
 }
 
 // Cek status maintenance dari database
-// Menggunakan prepared statement untuk keamanan
 $stmt = $conn->prepare("SELECT setting_value FROM settings WHERE setting_key = 'maintenance_mode' LIMIT 1");
 $stmt->execute();
 $result = $stmt->get_result();
-$maintenance_status = 'on';
+$maintenance_status = 'off';
 if ($result && $result->num_rows > 0) {
     $maintenance_status = $result->fetch_assoc()['setting_value'];
 }
@@ -60,7 +50,6 @@ if ($maintenance_status === 'on') {
     include('maintenance.php');
     exit();
 }
-
 // Ambil produk yang aktif dari database
 $products_result = $conn->query("SELECT * FROM produk WHERE is_active = TRUE ORDER BY harga ASC");
 $products = [];
@@ -69,23 +58,20 @@ if ($products_result) {
         $products[] = $row;
     }
 }
-// Ambil harga dan ID produk bulanan (produk dengan harga terendah)
-$harga_bulanan = !empty($products) ? $products[0]['harga'] : 0;
+
+// 1. Ambil harga perpanjangan dari tabel settings
+$stmt_harga = $conn->prepare("SELECT setting_value FROM settings WHERE setting_key = 'harga_perpanjangan_hwid' LIMIT 1");
+$stmt_harga->execute();
+$result_harga = $stmt_harga->get_result();
+$harga_perpanjangan = $result_harga->fetch_assoc();
+$stmt_harga->close();
+
+// Gunakan harga dari settings, atau fallback ke harga produk termurah jika tidak ada
+$harga_bulanan = !empty($harga_perpanjangan) ? $harga_perpanjangan['setting_value'] : (!empty($products) ? $products[0]['harga'] : 0);
+
+// 2. Tetap cari produk bulanan untuk ID-nya
 $produk_bulanan_id = !empty($products) ? $products[0]['id'] : 0;
 
-// Buat CSRF token jika belum ada
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-?>
-<?php
-// Pastikan baris ini ada di awal file
-session_start();
-
-// Buat token CSRF jika belum ada
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -547,7 +533,7 @@ if (empty($_SESSION['csrf_token'])) {
                 produkBulananId: <?php echo $produk_bulanan_id; ?>,
                 pilihan: {},
             };
-
+    
             function init() {
                 document.querySelectorAll('#step-1 .selection-card').forEach(card => {
                     card.addEventListener('click', () => selectChoice(card));
@@ -557,25 +543,23 @@ if (empty($_SESSION['csrf_token'])) {
                 wizard.form.addEventListener('submit', handleFormSubmit);
                 updateButtons();
             }
-
+    
             function selectChoice(selectedCard) {
                 document.querySelectorAll('#step-1 .selection-card').forEach(card => card.classList.remove('selected'));
                 selectedCard.classList.add('selected');
                 wizard.pilihan.layanan = selectedCard.dataset.choice;
-                updateButtons(); // Aktifkan tombol "Lanjutkan"
+                updateButtons();
             }
-
+    
             async function nextStep() {
                 if (wizard.currentStep < wizard.totalSteps) {
                     if (wizard.currentStep === 1) {
                         buildStep2();
                     } else if (wizard.currentStep === 2) {
-                        // Validasi di sisi klien
                         if (!validateStep2()) {
                             Swal.fire('Data Belum Lengkap', 'Silakan isi semua data yang diperlukan.', 'warning');
                             return;
                         }
-                        // Validasi di sisi server
                         const isValid = await validateStep2Server();
                         if (!isValid) return;
                         buildStep3();
@@ -584,14 +568,14 @@ if (empty($_SESSION['csrf_token'])) {
                     updateWizard();
                 }
             }
-
+    
             function prevStep() {
                 if (wizard.currentStep > 1) {
                     wizard.currentStep--;
                     updateWizard();
                 }
             }
-
+    
             function updateWizard() {
                 wizard.steps.forEach(step => step.classList.remove('active'));
                 document.getElementById(`step-${wizard.currentStep}`).classList.add('active');
@@ -602,14 +586,14 @@ if (empty($_SESSION['csrf_token'])) {
                 wizard.progressBar.style.width = `${progressPercentage}%`;
                 updateButtons();
             }
-
+    
             function updateButtons() {
                 wizard.prevBtn.style.display = wizard.currentStep > 1 ? 'inline-block' : 'none';
                 wizard.nextBtn.style.display = wizard.currentStep < wizard.totalSteps ? 'inline-block' : 'none';
                 wizard.payBtn.style.display = wizard.currentStep === wizard.totalSteps ? 'inline-block' : 'none';
                 wizard.nextBtn.disabled = wizard.currentStep === 1 && !wizard.pilihan.layanan;
             }
-
+    
             function buildStep2() {
                 const titleEl = document.getElementById('step-2-title');
                 const contentEl = document.getElementById('step-2-content');
@@ -633,7 +617,7 @@ if (empty($_SESSION['csrf_token'])) {
                 attachStep2Listeners();
                 updateButtons();
             }
-
+    
             function attachStep2Listeners() {
                 document.querySelectorAll('#step-2 input').forEach(input => {
                     input.addEventListener('input', () => { wizard.nextBtn.disabled = !validateStep2(); });
@@ -657,7 +641,7 @@ if (empty($_SESSION['csrf_token'])) {
                     });
                 });
             }
-
+    
             function validateStep2() {
                 let isValid = true;
                 const requiredInputs = document.querySelectorAll('#step-2 input[required]');
@@ -669,12 +653,19 @@ if (empty($_SESSION['csrf_token'])) {
                 }
                 return isValid;
             }
-
+    
             async function validateStep2Server() {
                 const layanan = wizard.pilihan.layanan;
-                let formData = new FormData();
-                formData.append('csrf_token', wizard.form.querySelector('input[name="csrf_token"]').value);
-
+                let formData = new FormData(wizard.form);
+    
+                // --- DEBUGGING: Tampilkan token yang akan dikirim ---
+                const tokenFromForm = wizard.form.querySelector('input[name="csrf_token"]').value;
+                console.log("Token CSRF yang dikirim dari form:", tokenFromForm);
+                // ----------------------------------------------------
+    
+                // Reset harga perpanjangan kustom
+                wizard.pilihan.hargaPerpanjanganAkun = null;
+    
                 if (layanan === 'perpanjang-hwid') {
                     const hwid = document.getElementById('input_hwid_perpanjang').value;
                     formData.append('tipe_order', 'perpanjang-hwid');
@@ -684,22 +675,21 @@ if (empty($_SESSION['csrf_token'])) {
                     formData.append('tipe_order', 'perpanjang-paket');
                     formData.append('username', username);
                 } else {
-                    // Untuk 'beli baru', tidak perlu validasi server di sini
                     return true;
                 }
-
+    
                 wizard.nextBtn.disabled = true;
                 wizard.nextBtn.textContent = 'Memvalidasi...';
-
+    
                 try {
-                    const response = await fetch('check_renewal.php', {
-                        method: 'POST',
-                        body: formData
-                    });
+                    const response = await fetch('check_renewal.php', { method: 'POST', body: formData });
                     const result = await response.json();
-
+    
                     if (result.success) {
                         Swal.fire('Validasi Berhasil', result.message, 'success');
+                        if (result.harga) {
+                            wizard.pilihan.hargaPerpanjanganAkun = parseFloat(result.harga);
+                        }
                         return true;
                     } else {
                         Swal.fire('Validasi Gagal', result.message, 'error');
@@ -707,7 +697,7 @@ if (empty($_SESSION['csrf_token'])) {
                     }
                 } catch (error) {
                     console.error('Error Validasi:', error);
-                    Swal.fire('Kesalahan Jaringan', 'Tidak dapat terhubung ke server validasi. Coba lagi.', 'error');
+                    Swal.fire('Kesalahan Jaringan', 'Tidak dapat terhubung ke server validasi.', 'error');
                     return false;
                 } finally {
                     wizard.nextBtn.disabled = false;
@@ -717,12 +707,8 @@ if (empty($_SESSION['csrf_token'])) {
             
             function buildStep3() {
                 const layanan = wizard.pilihan.layanan;
-                let layananText = '',
-                    detailText = '',
-                    durasiText = '',
-                    totalHarga = 0,
-                    produkId = wizard.produkBulananId;
-
+                let layananText = '', detailText = '', durasiText = '', totalHarga = 0, produkId = wizard.produkBulananId;
+    
                 if (layanan === 'baru') {
                     const selectedCard = document.querySelector('#step-2 .selection-card.selected');
                     if (selectedCard) {
@@ -736,97 +722,104 @@ if (empty($_SESSION['csrf_token'])) {
                     const username = document.getElementById('input_license_username_baru').value;
                     const password = document.getElementById('input_license_password_baru').value;
                     detailText = username;
-
+    
                     wizard.formTipeOrder.value = 'baru';
                     wizard.formProdukId.value = produkId;
                     wizard.formNamaPembeli.value = nama;
                     wizard.formNomorWhatsapp.value = whatsapp;
                     wizard.formLicenseUsername.value = username;
                     wizard.formLicensePassword.value = password;
-                } else if (layanan === 'perpanjang-hwid' || layanan === 'perpanjang-paket') {
-                    const inputBulan = document.getElementById(layanan === 'perpanjang-hwid' ? 'input_jumlah_bulan_hwid' : 'input_jumlah_bulan_paket');
+    
+                } else if (layanan === 'perpanjang-hwid') {
+                    const inputBulan = document.getElementById('input_jumlah_bulan_hwid');
                     const bulan = parseInt(inputBulan.value, 10);
                     totalHarga = wizard.hargaBulanan * bulan;
                     durasiText = `${bulan} Bulan`;
+                    layananText = 'Perpanjang HWID';
+                    const hwid = document.getElementById('input_hwid_perpanjang').value;
+                    detailText = `HWID: ...${hwid.slice(-6)}`;
+    
                     wizard.formTipeOrder.value = 'perpanjang';
                     wizard.formProdukId.value = wizard.produkBulananId;
                     wizard.formJumlahBulan.value = bulan;
-                    if (layanan === 'perpanjang-hwid') {
-                        layananText = 'Perpanjang HWID';
-                        const hwid = document.getElementById('input_hwid_perpanjang').value;
-                        detailText = `HWID: ...${hwid.slice(-6)}`;
-                        wizard.formRenewalType.value = 'hwid';
-                        wizard.formHwid.value = hwid;
-                    } else {
-                        layananText = 'Perpanjang Akun';
-                        const username = document.getElementById('input_license_username_perpanjang').value;
-                        detailText = `Username: ${username}`;
-                        wizard.formRenewalType.value = 'session';
-                        wizard.formLicenseUsername.value = username;
-                    }
+                    wizard.formRenewalType.value = 'hwid';
+                    wizard.formHwid.value = hwid;
+    
+                } else if (layanan === 'perpanjang-paket') {
+                    const inputBulan = document.getElementById('input_jumlah_bulan_paket');
+                    const bulan = parseInt(inputBulan.value, 10);
+                    const hargaPerBulan = wizard.pilihan.hargaPerpanjanganAkun || wizard.hargaBulanan;
+                    totalHarga = hargaPerBulan * bulan;
+                    layananText = 'Perpanjang Akun';
+                    const username = document.getElementById('input_license_username_perpanjang').value;
+                    detailText = `Username: ${username}`;
+                    durasiText = `${bulan} Bulan`;
+    
+                    wizard.formTipeOrder.value = 'perpanjang';
+                    wizard.formRenewalType.value = 'session';
+                    wizard.formProdukId.value = wizard.produkBulananId;
+                    wizard.formJumlahBulan.value = bulan;
+                    wizard.formLicenseUsername.value = username;
                 }
+                
                 document.getElementById('summary-layanan').textContent = layananText;
                 document.getElementById('summary-detail').textContent = detailText;
                 document.getElementById('summary-durasi').textContent = durasiText;
                 document.getElementById('summary-total').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalHarga);
             }
-
+    
             async function handleFormSubmit(event) {
                 event.preventDefault();
                 const payButton = document.getElementById('pay-btn');
                 const originalButtonText = payButton.textContent;
                 payButton.textContent = 'Memproses...';
                 payButton.disabled = true;
+    
                 const formData = new FormData(wizard.form);
-
+    
                 try {
                     const response = await fetch('proses_pembayaran.php', {
                         method: 'POST',
                         body: formData
                     });
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
+    
                     const result = await response.json();
-                    if (result.success && result.snap_token) {
-                        snap.pay(result.snap_token, {
-                            onSuccess: function() {
-                                window.location.href = '/halaman-sukses.html';
-                            },
-                            onPending: function() {
-                                Swal.fire('Pembayaran Tertunda', 'Silakan selesaikan pembayaran Anda.', 'info');
-                            },
-                            onError: function() {
-                                Swal.fire('Pembayaran Gagal', 'Terjadi kesalahan saat pemrosesan.', 'error');
-                            },
-                            onClose: function() {
-                                if (!Swal.isVisible()) {
-                                    payButton.textContent = originalButtonText;
-                                    payButton.disabled = false;
-                                }
-                            }
-                        });
-                    } else {
+    
+                    if (!response.ok || !result.success) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops... Terjadi Kesalahan',
-                            text: result.message || 'Gagal mendapatkan token pembayaran.'
+                            text: result.message || 'Gagal memproses permintaan.'
                         });
                         payButton.textContent = originalButtonText;
                         payButton.disabled = false;
+                        return;
+                    }
+    
+                    if (result.success && result.snap_token) {
+                        snap.pay(result.snap_token, {
+                            onSuccess: function(result) { window.location.href = '/halaman-sukses.html'; },
+                            onPending: function(result) { Swal.fire('Pembayaran Tertunda', 'Silakan selesaikan pembayaran Anda.', 'info'); },
+                            onError: function(result) { Swal.fire('Pembayaran Gagal', 'Terjadi kesalahan saat pemrosesan.', 'error'); },
+                            onClose: function() {
+                                Swal.fire('Pembayaran Dibatalkan', 'Anda menutup jendela pembayaran.', 'warning');
+                                payButton.textContent = originalButtonText;
+                                payButton.disabled = false;
+                            }
+                        });
                     }
                 } catch (error) {
                     console.error('Fetch Error:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Kesalahan Jaringan',
-                        text: 'Tidak dapat terhubung ke server. Silakan coba lagi.'
+                        text: 'Tidak dapat terhubung ke server. Periksa konsol browser (F12) untuk detail.'
                     });
                     payButton.textContent = originalButtonText;
                     payButton.disabled = false;
                 }
             }
-
+    
             init();
         });
     </script>

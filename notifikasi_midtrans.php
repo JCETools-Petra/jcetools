@@ -17,7 +17,6 @@ function encrypt_hwid_identik(string $plaintext): string {
 }
 
 // Fungsi untuk mengirim pesan WhatsApp
-// Implementasi ini hanya contoh, Anda perlu menggantinya dengan kode API Anda yang sebenarnya
 function kirimWhatsApp(string $target, string $pesan): bool {
     // URL API FonNte
     $url = "https://api.fonnte.com/send";
@@ -50,7 +49,6 @@ function kirimWhatsApp(string $target, string $pesan): bool {
     // Log respons untuk debugging
     log_message('whatsapp_response.log', "Target: {$target}, Response: " . $response);
 
-    // Periksa status HTTP dan respons dari API
     if ($http_code == 200) {
         $result = json_decode($response, true);
         if (isset($result['status']) && $result['status'] === 'success') {
@@ -68,10 +66,9 @@ if ($conn->connect_error) {
     exit("Connection failed.");
 }
 
+// Konfigurasi Midtrans
 \Midtrans\Config::$serverKey = $_ENV['MIDTRANS_SERVER_KEY'];
 \Midtrans\Config::$isProduction = ($_ENV['MIDTRANS_IS_PRODUCTION'] === 'true');
-$result = $conn->query("SELECT setting_value FROM settings WHERE setting_key = 'download_link' LIMIT 1");
-$download_link = ($result && $result->num_rows > 0) ? $result->fetch_assoc()['setting_value'] : '';
 
 try {
     $notif = new \Midtrans\Notification();
@@ -80,9 +77,17 @@ try {
     exit("Failed to get notification.");
 }
 
-$transaction = $notif->transaction_status;
+// Verifikasi Signature Key (Sangat Penting!)
+$signature_key = hash('sha512', $notif->order_id . $notif->status_code . $notif->gross_amount . \Midtrans\Config::$serverKey);
+if ($signature_key != $notif->signature_key) {
+    http_response_code(403);
+    log_message('midtrans_error.log', "Invalid signature key for Order ID: " . $notif->order_id);
+    exit("Invalid signature.");
+}
+
+$transaction_status = $notif->transaction_status;
 $order_id = $notif->order_id;
-$fraud = $notif->fraud_status;
+$fraud_status = $notif->fraud_status;
 
 $conn->begin_transaction();
 try {
@@ -98,35 +103,47 @@ try {
         exit("Order tidak ditemukan atau sudah diproses.");
     }
 
-    if (($transaction == 'capture' || $transaction == 'settlement') && $fraud == 'accept') {
-        // Perbarui status_pembayaran di tabel transaksi
-        $conn->query("UPDATE transaksi SET status_pembayaran = 'paid', waktu_pemesanan = NOW() WHERE order_id = '{$order_id}'");
+    // Hanya proses jika pembayaran lunas dan aman
+    if (($transaction_status == 'capture' || $transaction_status == 'settlement') && $fraud_status == 'accept') {
         
-        $produk_res = $conn->query("SELECT durasi_hari, nama_produk FROM produk WHERE id = " . (int)$transaksi['produk_id']);
-        $produk = $produk_res->fetch_assoc();
+        $stmt_update_trans = $conn->prepare("UPDATE transaksi SET status_pembayaran = 'paid', waktu_pemesanan = NOW() WHERE order_id = ?");
+        $stmt_update_trans->bind_param('s', $order_id);
+        $stmt_update_trans->execute();
+        $stmt_update_trans->close();
+        
+        // Ambil detail produk termasuk link download spesifik
+        $stmt_produk = $conn->prepare("SELECT durasi_hari, nama_produk, download_link FROM produk WHERE id = ?");
+        $stmt_produk->bind_param('i', $transaksi['produk_id']);
+        $stmt_produk->execute();
+        $produk = $stmt_produk->get_result()->fetch_assoc();
+        $stmt_produk->close();
+
         $nama_produk = $produk['nama_produk'];
+        $download_link_produk = $produk['download_link'];
         $pesan_wa = "";
+        $nomor_wa_tujuan = $transaksi['nomor_whatsapp'];
 
         if ($transaksi['tipe_order'] === 'baru') {
             $durasi = (int)$produk['durasi_hari'];
-            $expiry_date = date('Y-m-d H:i:s', strtotime("+$durasi days"));
+            $expiry_date_obj = new DateTime();
+            $expiry_date_obj->add(new DateInterval("P{$durasi}D"));
+            $expiry_date = $expiry_date_obj->format('Y-m-d H:i:s');
 
             if (!empty($transaksi['license_username']) && !empty($transaksi['license_password'])) {
-                // Hashing kata sandi saat membuat akun baru
                 $hashed_password = password_hash($transaksi['license_password'], PASSWORD_BCRYPT);
                 
-                $stmt_lic = $conn->prepare("INSERT INTO licensed_users (username, password, expiry_date, phone_number) VALUES (?, ?, ?, ?)");
-                $stmt_lic->bind_param("ssss", $transaksi['license_username'], $hashed_password, $expiry_date, $transaksi['nomor_whatsapp']);
+                $stmt_lic = $conn->prepare("INSERT INTO licensed_users (username, password, produk_id, expiry_date, phone_number) VALUES (?, ?, ?, ?, ?)");
+                $stmt_lic->bind_param("ssiss", $transaksi['license_username'], $hashed_password, $transaksi['produk_id'], $expiry_date, $transaksi['nomor_whatsapp']);
                 $stmt_lic->execute();
                 $stmt_lic->close();
                 
-                $pesan_wa = "✅ *Pembayaran Berhasil!*\n\nTerima kasih, *{$transaksi['nama_pembeli']}*.\n\nLisensi *{$nama_produk}* Anda telah diaktifkan. Berikut detail login Anda:\n\nUsername: `{$transaksi['license_username']}`\nPassword: `{$transaksi['license_password']}`\nAktif hingga: *{$expiry_date}*\n\nSilakan unduh launcher di:\n{$download_link}\n\nTerima kasih!";
+                $pesan_wa = "✅ *Pembayaran Berhasil!*\n\nTerima kasih, *{$transaksi['nama_pembeli']}*.\n\nLisensi *{$nama_produk}* Anda telah diaktifkan. Berikut detail login Anda:\n\nUsername: `{$transaksi['license_username']}`\nPassword: `{$transaksi['license_password']}`\nAktif hingga: *{$expiry_date}*\n\nSilakan unduh launcher di:\n{$download_link_produk}\n\nTerima kasih!";
             }
         } elseif ($transaksi['tipe_order'] === 'perpanjang') {
+            $jumlah_bulan = (int)$transaksi['jumlah_bulan'] > 0 ? (int)$transaksi['jumlah_bulan'] : 1;
+            $total_durasi_hari = 30 * $jumlah_bulan;
+
             if ($transaksi['renewal_type'] === 'hwid') {
-                $jumlah_bulan = (int)$transaksi['jumlah_bulan'];
-                if ($jumlah_bulan < 1) $jumlah_bulan = 1;
-                $total_durasi_hari = 30 * $jumlah_bulan;
                 $hwid_encrypted = encrypt_hwid_identik($transaksi['hwid']);
                 
                 $stmt_jce = $conn->prepare("UPDATE user_jce SET expiry_date = DATE_ADD(IF(expiry_date > NOW(), expiry_date, NOW()), INTERVAL ? DAY) WHERE hwid_encrypted = ?");
@@ -134,28 +151,51 @@ try {
                 $stmt_jce->execute();
                 $stmt_jce->close();
                 
-                $pesan_wa = "✅ *Pembayaran Berhasil!*\n\nTerima kasih, *{$transaksi['nama_pembeli']}*.\n\nLisensi HWID Anda telah berhasil diperpanjang selama *{$jumlah_bulan} bulan*.";
-            } elseif ($transaksi['renewal_type'] === 'session') {
-                $jumlah_bulan = (int)$transaksi['jumlah_bulan'];
-                if ($jumlah_bulan < 1) $jumlah_bulan = 1;
-                $total_durasi_hari = 30 * $jumlah_bulan;
+                $stmt_get_expiry = $conn->prepare("SELECT Nama, expiry_date, phone_number FROM user_jce WHERE hwid_encrypted = ?");
+                $stmt_get_expiry->bind_param('s', $hwid_encrypted);
+                $stmt_get_expiry->execute();
+                $user_info = $stmt_get_expiry->get_result()->fetch_assoc();
+                $stmt_get_expiry->close();
+
+                $nama_pembeli = $user_info['Nama'] ?? 'Pelanggan';
+                $nomor_wa_tujuan = $user_info['phone_number'] ?? '';
+                $new_expiry_date = $user_info['expiry_date'] ?? 'N/A';
                 
+                $pesan_wa = "✅ *Perpanjangan Lisensi Berhasil!*\n\nTerima kasih, *{$nama_pembeli}*.\n\nLisensi HWID Anda telah diperpanjang selama *{$jumlah_bulan} bulan*.\n\nAktif hingga: *{$new_expiry_date}*";
+
+            } elseif ($transaksi['renewal_type'] === 'session') {
                 $stmt_lic = $conn->prepare("UPDATE licensed_users SET expiry_date = DATE_ADD(IF(expiry_date > NOW(), expiry_date, NOW()), INTERVAL ? DAY) WHERE username = ?");
                 $stmt_lic->bind_param("is", $total_durasi_hari, $transaksi['license_username']);
                 $stmt_lic->execute();
                 $stmt_lic->close();
                 
-                $pesan_wa = "✅ *Pembayaran Berhasil!*\n\nTerima kasih, *{$transaksi['nama_pembeli']}*.\n\nLisensi *{$nama_produk}* untuk akun '{$transaksi['license_username']}' telah berhasil diperpanjang selama *{$jumlah_bulan} bulan*.";
+                // Ambil link download berdasarkan produk milik user
+                $stmt_user_product = $conn->prepare(
+                    "SELECT p.download_link 
+                     FROM licensed_users u 
+                     JOIN produk p ON u.produk_id = p.id 
+                     WHERE u.username = ?"
+                );
+                $stmt_user_product->bind_param("s", $transaksi['license_username']);
+                $stmt_user_product->execute();
+                $user_product = $stmt_user_product->get_result()->fetch_assoc();
+                $stmt_user_product->close();
+                $download_link_user = $user_product['download_link'] ?? '#';
+
+                $pesan_wa = "✅ *Perpanjangan Lisensi Berhasil!*\n\nLisensi *{$nama_produk}* untuk akun '{$transaksi['license_username']}' telah diperpanjang selama *{$jumlah_bulan} bulan*.\n\nSilakan unduh update launcher (jika ada) di:\n{$download_link_user}";
             }
         }
         
-        if (!empty($pesan_wa)) {
-            kirimWhatsApp($transaksi['nomor_whatsapp'], $pesan_wa);
+        if (!empty($pesan_wa) && !empty($nomor_wa_tujuan)) {
+            kirimWhatsApp($nomor_wa_tujuan, $pesan_wa);
         }
 
-    } else if (in_array($transaction, ['expire', 'deny', 'cancel'])) {
-        $new_status = ($transaction == 'expire') ? 'expired' : 'failed';
-        $conn->query("UPDATE transaksi SET status_pembayaran = '{$new_status}', waktu_pemesanan = NOW() WHERE order_id = '{$order_id}'");
+    } else if (in_array($transaction_status, ['expire', 'deny', 'cancel'])) {
+        $new_status = ($transaction_status == 'expire') ? 'expired' : 'failed';
+        $stmt_fail_trans = $conn->prepare("UPDATE transaksi SET status_pembayaran = ?, waktu_pemesanan = NOW() WHERE order_id = ?");
+        $stmt_fail_trans->bind_param('ss', $new_status, $order_id);
+        $stmt_fail_trans->execute();
+        $stmt_fail_trans->close();
     }
 
     $conn->commit();

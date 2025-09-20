@@ -187,6 +187,11 @@ $is_maintenance_on = ($current_maintenance_status === 'on');
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
+                    <a class="nav-link" href="pengaturan.php">
+                        <i class="fas fa-cog"></i> Pengaturan
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="logout.php">Logout <i class="bi bi-box-arrow-right"></i></a>
                 </li>
             </ul>
@@ -220,16 +225,6 @@ $is_maintenance_on = ($current_maintenance_status === 'on');
 
         <hr class="my-4" style="border-color: var(--border-color);">
 
-        <h5 class="mt-4">Pengaturan Link Download</h5>
-        <p class="mb-2">URL ini akan dikirimkan ke pelanggan via WhatsApp setelah pembayaran berhasil.</p>
-        <form action="dashboard.php" method="POST" class="mt-3">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-            <div class="mb-3">
-                <label for="download_link" class="form-label">URL Download Launcher</label>
-                <input type="url" class="form-control bg-dark text-white border-secondary" id="download_link" name="download_link" value="<?php echo htmlspecialchars($current_download_link); ?>" required>
-            </div>
-            <button type="submit" name="update_download_link" class="btn btn-gold"><i class="bi bi-save"></i> Simpan Link</button>
-        </form>
     </div>
     <?php endif; ?>
 
