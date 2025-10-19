@@ -2,19 +2,21 @@
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/core/session_starter.php';
 
-ini_set('display_errors', 1);
+// 1. PENYESUAIAN: Lokasi file log dibuat dinamis dan aman.
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/error_log_pembayaran.txt');
 error_reporting(E_ALL);
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 header('Content-Type: application/json');
 
-// REVISI: Validasi CSRF dengan metode Double Submit Cookie agar konsisten
-$token_from_header = isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? $_SERVER['HTTP_X_CSRF_TOKEN'] : '';
-$token_from_cookie = isset($_COOKIE['X-CSRF-TOKEN']) ? $_COOKIE['X-CSRF-TOKEN'] : '';
+// Validasi CSRF (Double Submit Cookie)
+$token_from_header = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+$token_from_cookie = $_COOKIE['X-CSRF-TOKEN'] ?? '';
 
 if (empty($token_from_header) || empty($token_from_cookie) || !hash_equals($token_from_cookie, $token_from_header)) {
-    http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Validasi keamanan gagal. Silakan muat ulang halaman.']);
     exit();
 }
@@ -25,8 +27,6 @@ $nama_pembeli = filter_input(INPUT_POST, 'nama_pembeli', FILTER_SANITIZE_SPECIAL
 $nomor_whatsapp = filter_input(INPUT_POST, 'nomor_whatsapp', FILTER_SANITIZE_SPECIAL_CHARS);
 $license_username = filter_input(INPUT_POST, 'license_username', FILTER_SANITIZE_SPECIAL_CHARS);
 $raw_password = $_POST['license_password'] ?? '';
-// HASH PASSWORD SEBELUM DISIMPAN!
-$license_password = password_hash($raw_password, PASSWORD_BCRYPT);
 $hwid = filter_input(INPUT_POST, 'hwid', FILTER_SANITIZE_SPECIAL_CHARS);
 $renewal_type = filter_input(INPUT_POST, 'renewal_type', FILTER_SANITIZE_SPECIAL_CHARS);
 $produk_id = filter_input(INPUT_POST, 'produk_id', FILTER_VALIDATE_INT);
@@ -37,17 +37,33 @@ if (empty($tipe_order) || $produk_id === false) {
     echo json_encode(['success' => false, 'message' => 'Data order tidak valid.']);
     exit();
 }
-if ($tipe_order === 'baru' && (empty($nama_pembeli) || empty($nomor_whatsapp) || empty($license_username) || empty($license_password))) {
+if ($tipe_order === 'baru' && (empty($nama_pembeli) || empty($nomor_whatsapp) || empty($license_username) || empty($raw_password))) {
     echo json_encode(['success' => false, 'message' => 'Semua field untuk akun baru wajib diisi.']);
     exit();
 }
 
 $conn = new mysqli($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
 if ($conn->connect_error) {
+    error_log("Database connection failed: " . $conn->connect_error);
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Terjadi masalah pada server kami.']);
     exit();
 }
+
+// 3. PENYESUAIAN: Cek apakah username sudah ada untuk order baru
+if ($tipe_order === 'baru') {
+    $stmt_check = $conn->prepare("SELECT id FROM licensed_users WHERE username = ?");
+    $stmt_check->bind_param('s', $license_username);
+    $stmt_check->execute();
+    if ($stmt_check->get_result()->num_rows > 0) {
+        echo json_encode(['success' => false, 'message' => 'Username sudah digunakan. Silakan pilih username lain.']);
+        $stmt_check->close();
+        $conn->close();
+        exit();
+    }
+    $stmt_check->close();
+}
+
 
 $stmt = $conn->prepare("SELECT nama_produk, harga FROM produk WHERE id = ?");
 $stmt->bind_param('i', $produk_id);
@@ -61,20 +77,43 @@ if (!$produk) {
 
 $harga = 0;
 $item_details = [];
-$order_id = 'ORD-' . strtoupper(bin2hex(random_bytes(8)));
+// 2. PENYESUAIAN: Membuat order_id lebih unik untuk mencegah duplikasi.
+$order_id = 'ORD-' . strtoupper(bin2hex(random_bytes(5))) . '-' . round(microtime(true) * 1000);
 
 if ($tipe_order === 'baru') {
     $harga = (int)$produk['harga'];
     $item_details[] = ['id' => $produk_id, 'price' => $harga, 'quantity' => 1, 'name' => $produk['nama_produk']];
     
+    // Hash password sebelum disimpan ke tabel transaksi
+    $license_password_hashed = password_hash($raw_password, PASSWORD_BCRYPT);
+
     $stmt = $conn->prepare("INSERT INTO `transaksi` (order_id, nama_pembeli, nomor_whatsapp, license_username, license_password, produk_id, tipe_order, jumlah_bulan, harga, status_pembayaran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $status_pembayaran = 'pending';
     $jumlah_bulan_baru = 1;
-    $stmt->bind_param('sssssisiis', $order_id, $nama_pembeli, $nomor_whatsapp, $license_username, $license_password, $produk_id, $tipe_order, $jumlah_bulan_baru, $harga, $status_pembayaran);
+    $stmt->bind_param('sssssisiis', $order_id, $nama_pembeli, $nomor_whatsapp, $license_username, $license_password_hashed, $produk_id, $tipe_order, $jumlah_bulan_baru, $harga, $status_pembayaran);
 
 } else if ($tipe_order === 'perpanjang') {
-    $harga = (int)$produk['harga'] * (int)$jumlah_bulan;
-    $item_details[] = ['id' => $produk_id, 'price' => (int)$produk['harga'], 'quantity' => (int)$jumlah_bulan, 'name' => $produk['nama_produk'] . ' (' . $jumlah_bulan . ' Bulan)'];
+    $harga_satuan = 0;
+    $nama_item = '';
+
+    if ($renewal_type === 'hwid') {
+        // JIKA TIPE PERPANJANGAN ADALAH HWID, AMBIL HARGA DARI 'SETTINGS'
+        $stmt_harga_hwid = $conn->prepare("SELECT setting_value FROM settings WHERE setting_key = 'harga_perpanjangan_hwid' LIMIT 1");
+        $stmt_harga_hwid->execute();
+        $result_harga_hwid = $stmt_harga_hwid->get_result();
+        $setting_harga = $result_harga_hwid->fetch_assoc();
+        $stmt_harga_hwid->close();
+        
+        $harga_satuan = (int)($setting_harga['setting_value'] ?? $produk['harga']); // Fallback ke harga produk jika setting tidak ada
+        $nama_item = 'Perpanjangan Lisensi HWID';
+    } else {
+        // Jika bukan HWID (misal: perpanjang akun), gunakan harga produk
+        $harga_satuan = (int)$produk['harga'];
+        $nama_item = $produk['nama_produk'];
+    }
+
+    $harga = $harga_satuan * (int)$jumlah_bulan;
+    $item_details[] = ['id' => $produk_id, 'price' => $harga_satuan, 'quantity' => (int)$jumlah_bulan, 'name' => $nama_item . ' (' . $jumlah_bulan . ' Bulan)'];
 
     $stmt = $conn->prepare("INSERT INTO `transaksi` (order_id, tipe_order, renewal_type, produk_id, jumlah_bulan, license_username, hwid, harga, status_pembayaran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $status_pembayaran = 'pending';
@@ -82,7 +121,8 @@ if ($tipe_order === 'baru') {
 }
 
 if (!$stmt->execute()) {
-    echo json_encode(['success' => false, 'message' => 'Gagal menyimpan data transaksi: ' . $stmt->error]);
+    error_log("Gagal insert transaksi: " . $stmt->error);
+    echo json_encode(['success' => false, 'message' => 'Gagal menyimpan data transaksi.']);
     exit();
 }
 $stmt->close();
@@ -102,6 +142,7 @@ try {
     $snapToken = \Midtrans\Snap::getSnapToken($params);
     echo json_encode(['success' => true, 'snap_token' => $snapToken]);
 } catch (\Exception $e) {
+    error_log("Midtrans Snap Token Error: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Gagal membuat sesi pembayaran: ' . $e->getMessage()]);
 }
 

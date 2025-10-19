@@ -521,3 +521,221 @@ Stack trace:
 [11-Sep-2025 14:27:57 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 30
 [11-Sep-2025 14:28:02 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 30
 [11-Sep-2025 14:28:02 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 30
+[20-Sep-2025 21:52:58 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class "Dotenv\Dotenv\Dotenv" not found in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 9
+[20-Sep-2025 21:55:29 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 21:55:29 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 21:55:39 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 21:55:39 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 21:55:43 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 21:55:43 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 21:57:23 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 21:57:23 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 21:57:29 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 21:57:29 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 21:57:46 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 21:57:46 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 22:00:26 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 22:00:26 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 22:00:31 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[20-Sep-2025 22:00:31 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[23-Sep-2025 10:25:51 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[23-Sep-2025 10:25:51 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[23-Sep-2025 10:27:27 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[23-Sep-2025 10:27:27 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[23-Sep-2025 10:28:15 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[23-Sep-2025 10:28:15 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[23-Sep-2025 10:28:41 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[23-Sep-2025 10:28:41 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[23-Sep-2025 23:24:41 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[23-Sep-2025 23:24:41 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[24-Sep-2025 23:10:14 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[24-Sep-2025 23:10:15 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[26-Sep-2025 01:56:07 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[26-Sep-2025 01:56:07 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[04-Oct-2025 21:33:46 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[04-Oct-2025 21:33:46 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[05-Oct-2025 03:31:18 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[05-Oct-2025 03:31:18 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[06-Oct-2025 14:41:04 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[06-Oct-2025 14:41:04 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[06-Oct-2025 14:41:09 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[06-Oct-2025 14:41:09 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[06-Oct-2025 14:41:16 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[06-Oct-2025 14:41:16 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[13-Oct-2025 23:21:55 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[13-Oct-2025 23:21:55 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[13-Oct-2025 23:24:28 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[13-Oct-2025 23:24:28 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[13-Oct-2025 23:27:52 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[13-Oct-2025 23:27:52 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[14-Oct-2025 01:00:47 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[14-Oct-2025 01:00:47 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[14-Oct-2025 01:00:47 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[14-Oct-2025 01:01:30 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[14-Oct-2025 01:01:30 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[14-Oct-2025 01:01:30 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[14-Oct-2025 11:22:59 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[14-Oct-2025 11:22:59 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[14-Oct-2025 11:22:59 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[15-Oct-2025 04:25:35 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 04:25:35 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 04:26:14 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 04:26:14 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 04:27:08 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 04:27:08 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 04:39:20 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 04:39:20 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 11:49:37 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 11:49:37 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 11:49:37 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[15-Oct-2025 12:52:12 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 12:52:12 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 12:52:12 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[15-Oct-2025 13:07:39 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:07:39 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:07:39 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[15-Oct-2025 13:17:54 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:17:54 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:17:54 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[15-Oct-2025 13:18:00 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:18:00 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:18:00 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[15-Oct-2025 13:18:41 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:18:41 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:18:41 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[15-Oct-2025 13:37:07 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:37:07 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:37:07 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[15-Oct-2025 13:40:57 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:40:57 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:41:23 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:41:23 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:43:02 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:43:02 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:43:02 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[15-Oct-2025 13:44:07 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:44:07 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:44:07 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[15-Oct-2025 13:46:19 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:46:19 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 32
+[15-Oct-2025 13:46:19 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:167
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(167): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(229): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 167
+[15-Oct-2025 13:47:42 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 79
+[15-Oct-2025 13:47:42 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 79
+[15-Oct-2025 13:47:42 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'e0e0ee9ab9c296bec879b5bdecdb01ff' for key 'hwid_encrypted' in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php:235
+Stack trace:
+#0 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(235): mysqli_stmt->execute()
+#1 /home/apsx2353/public_html/jcetools.my.id/hwid/process.php(298): replaceEncryptedHWIDInDB()
+#2 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 235
+[15-Oct-2025 13:49:23 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 77
+[15-Oct-2025 13:49:23 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 77
+[15-Oct-2025 13:49:23 Asia/Jakarta] [2025-10-15 13:49:23] DUPLICATE ENTRY DITEMUKAN: HWID baru 'e0e0ee9ab9c296bec879b5bdecdb01ff' sudah digunakan.
+[15-Oct-2025 13:50:14 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 77
+[15-Oct-2025 13:50:14 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 77
+[15-Oct-2025 13:50:14 Asia/Jakarta] [2025-10-15 13:50:14] DUPLICATE ENTRY DITEMUKAN: HWID baru 'e0e0ee9ab9c296bec879b5bdecdb01ff' sudah digunakan.
+[15-Oct-2025 13:50:50 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 77
+[15-Oct-2025 13:50:50 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 77
+[15-Oct-2025 13:50:50 Asia/Jakarta] [2025-10-15 13:50:50] DUPLICATE ENTRY DITEMUKAN: HWID baru 'e0e0ee9ab9c296bec879b5bdecdb01ff' sudah digunakan.
+[15-Oct-2025 14:01:21 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 77
+[15-Oct-2025 14:01:21 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 77
+[15-Oct-2025 14:05:31 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 81
+[15-Oct-2025 14:05:31 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 81
+[15-Oct-2025 14:05:31 Asia/Jakarta] PHP Warning:  Undefined array key "Nama" in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 320
+[15-Oct-2025 14:09:00 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:09:00 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:10:29 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:10:29 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:10:29 Asia/Jakarta] [2025-10-15 14:10:29] Gagal mengirim email: Alamat email pengguna kosong.
+[15-Oct-2025 14:13:04 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:13:04 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:13:31 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:13:31 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:14:58 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:14:58 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:14:58 Asia/Jakarta] [2025-10-15 14:14:58] DUPLICATE ENTRY DITEMUKAN: HWID baru 'a0f73869abbda82cad2fa9dcba14c8ac' sudah digunakan.
+[15-Oct-2025 14:15:35 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:15:35 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:18:49 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:18:49 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:18:49 Asia/Jakarta] [2025-10-15 14:18:49] DUPLICATE ENTRY DITEMUKAN: HWID baru 'e0e0ee9ab9c296bec879b5bdecdb01ff' sudah digunakan.
+[15-Oct-2025 14:19:15 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:19:15 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:19:15 Asia/Jakarta] [2025-10-15 14:19:15] Gagal mengirim email: Alamat email pengguna kosong.
+[15-Oct-2025 14:19:45 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 14:19:45 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 17:39:03 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 17:39:03 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[15-Oct-2025 17:39:03 Asia/Jakarta] [2025-10-15 17:39:03] Gagal mengirim email: Alamat email pengguna kosong.
+[16-Oct-2025 14:58:43 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[16-Oct-2025 14:58:43 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[16-Oct-2025 14:58:43 Asia/Jakarta] [2025-10-16 14:58:43] Gagal mengirim email: Alamat email pengguna kosong.
+[17-Oct-2025 22:19:52 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[17-Oct-2025 22:19:52 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78

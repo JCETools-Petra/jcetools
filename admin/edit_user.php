@@ -6,7 +6,8 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 }
 
 require_once __DIR__ . '/core/db_connect.php';
-require_once __DIR__ . '/core/whatsapp_helper.php';
+require_once __DIR__ . '/core/email_helper.php'; 
+require_once __DIR__ . '/core/crypto_helper.php'; // Panggil helper dekripsi
 
 $user_id = $_GET['id'] ?? null;
 if (!$user_id) {
@@ -16,24 +17,49 @@ if (!$user_id) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = $_POST['nama'];
-    $hwid = $_POST['hwid'];
+    $hwid_encrypted = $_POST['hwid']; // Ini masih dalam bentuk terenkripsi
     $expiry_date = $_POST['expiry_date'];
-    $phone_number = $_POST['phone_number'];
+    $email = $_POST['email'];
 
-    $stmt = $conn->prepare("UPDATE user_jce SET Nama = ?, hwid_encrypted = ?, expiry_date = ?, phone_number = ? WHERE id = ?");
-    $stmt->bind_param('ssssi', $nama, $hwid, $expiry_date, $phone_number, $user_id);
+    // Update data di database
+    $stmt = $conn->prepare("UPDATE user_jce SET Nama = ?, hwid_encrypted = ?, expiry_date = ?, email = ? WHERE id = ?");
+    $stmt->bind_param('ssssi', $nama, $hwid_encrypted, $expiry_date, $email, $user_id);
 
     if ($stmt->execute()) {
-        // Tentukan apakah tanggal kedaluwarsa adalah "Permanent"
-        $expiry_year = (int)date('Y', strtotime($expiry_date));
-        $formatted_expiry_date = ($expiry_year > 2030) ? 'Permanent' : date('d F Y H:i', strtotime($expiry_date));
         
-        // Perbaiki: Kirim notifikasi setelah update berhasil
-        $pesan_notifikasi = "Halo {$nama},\n\nData lisensi JCE Tools Anda telah berhasil diperbarui oleh admin.\n\nTanggal Kedaluwarsa Baru: " . $formatted_expiry_date . "\n\nTerima kasih.";
+        // ==================================================================
+        // PENAMBAHAN BARU: Kirim email detail setelah update berhasil
+        // ==================================================================
         
-        if (!empty($phone_number)) {
-            kirimWhatsApp($phone_number, $pesan_notifikasi);
+        // Kirim notifikasi email jika alamat email valid
+        if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            
+            // 1. Dekripsi HWID untuk ditampilkan di email
+            $hwid_decrypted = decrypt_hwid($hwid_encrypted);
+            if ($hwid_decrypted === false) {
+                $hwid_decrypted = '[Data HWID tidak valid]';
+            }
+
+            // 2. Format tanggal kedaluwarsa
+            $expiry_year = (int)date('Y', strtotime($expiry_date));
+            $formatted_expiry_date = ($expiry_year > 2030) ? 'Permanent' : date('d F Y H:i', strtotime($expiry_date));
+
+            // 3. Siapkan subjek dan isi pesan email yang detail
+            $subjek_email = "Informasi Lisensi JCE Tools Anda Telah Diperbarui";
+            
+            $pesan_notifikasi = "Data lisensi JCE Tools Anda telah berhasil diperbarui oleh admin. Di bawah ini adalah rincian informasi lisensi Anda yang terbaru:" .
+                                "<br><br><b>Nama Pengguna:</b> " . htmlspecialchars($nama) .
+                                "<br><b>Alamat Email:</b> " . htmlspecialchars($email) .
+                                "<br><b>HWID Anda:</b> " . htmlspecialchars($hwid_decrypted) .
+                                "<br><b>Berlaku Hingga:</b> " . $formatted_expiry_date .
+                                "<br><br>Mohon simpan informasi ini dengan baik. Jika Anda tidak merasa melakukan perubahan atau memiliki pertanyaan, silakan hubungi tim support kami.";
+            
+            // 4. Kirim email menggunakan helper
+            kirimEmail($email, $nama, $subjek_email, $pesan_notifikasi);
         }
+        // ==================================================================
+        // AKHIR DARI PENAMBAHAN
+        // ==================================================================
 
         header('Location: dashboard.php?status=edit_sukses');
         exit;
@@ -43,7 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 }
 
-$stmt = $conn->prepare("SELECT Nama, hwid_encrypted, expiry_date, phone_number FROM user_jce WHERE id = ?");
+// Bagian untuk menampilkan data di form (tidak ada perubahan di sini)
+$stmt = $conn->prepare("SELECT Nama, hwid_encrypted, expiry_date, email FROM user_jce WHERE id = ?");
 $stmt->bind_param('i', $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -71,7 +98,6 @@ $conn->close();
         body {
             background-color: var(--bg-dark);
             color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
         .container {
             background-color: #222;
@@ -81,12 +107,6 @@ $conn->close();
         }
         h2 {
             color: var(--gold);
-        }
-        hr {
-            border-color: #444;
-        }
-        .form-label {
-            color: var(--text-color);
         }
         .form-control {
             background-color: #2a2a2a;
@@ -104,24 +124,6 @@ $conn->close();
             border-color: var(--gold);
             color: var(--bg-dark);
             font-weight: bold;
-        }
-        .btn-primary:hover {
-            background-color: #ffd700;
-            border-color: #ffd700;
-            filter: brightness(1.1);
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-        }
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            border-color: #5a6268;
-        }
-        .alert-danger {
-            background-color: var(--red);
-            border-color: var(--red);
-            color: white;
         }
     </style>
 </head>
@@ -145,8 +147,8 @@ $conn->close();
         </div>
         
         <div class="mb-3">
-            <label for="phone_number" class="form-label">Nomor WhatsApp</label>
-            <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($user['phone_number'] ?? ''); ?>" placeholder="Contoh: 6281234567890">
+            <label for="email" class="form-label">Alamat Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" placeholder="Contoh: user@example.com">
         </div>
 
         <button type="submit" class="btn btn-primary">Update</button>

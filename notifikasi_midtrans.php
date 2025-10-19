@@ -68,7 +68,7 @@ if ($conn->connect_error) {
 
 // Konfigurasi Midtrans
 \Midtrans\Config::$serverKey = $_ENV['MIDTRANS_SERVER_KEY'];
-\Midtrans\Config::$isProduction = ($_ENV['MIDTRANS_IS_PRODUCTION'] === 'true');
+\Midtrans\Config::$isProduction = ($_ENV['MIDTRANS_IS_PRODUCTION'] === 'true'); // Bagian ini penting
 
 try {
     $notif = new \Midtrans\Notification();
@@ -130,10 +130,12 @@ try {
             $expiry_date = $expiry_date_obj->format('Y-m-d H:i:s');
 
             if (!empty($transaksi['license_username']) && !empty($transaksi['license_password'])) {
-                $hashed_password = password_hash($transaksi['license_password'], PASSWORD_BCRYPT);
+                // LANGSUNG GUNAKAN HASH DARI TABEL TRANSAKSI, JANGAN DI-HASH LAGI
+                $password_hash_from_transaksi = $transaksi['license_password']; 
                 
                 $stmt_lic = $conn->prepare("INSERT INTO licensed_users (username, password, produk_id, expiry_date, phone_number) VALUES (?, ?, ?, ?, ?)");
-                $stmt_lic->bind_param("ssiss", $transaksi['license_username'], $hashed_password, $transaksi['produk_id'], $expiry_date, $transaksi['nomor_whatsapp']);
+                // Gunakan variabel baru yang berisi hash asli
+                $stmt_lic->bind_param("ssiss", $transaksi['license_username'], $password_hash_from_transaksi, $transaksi['produk_id'], $expiry_date, $transaksi['nomor_whatsapp']);
                 $stmt_lic->execute();
                 $stmt_lic->close();
                 

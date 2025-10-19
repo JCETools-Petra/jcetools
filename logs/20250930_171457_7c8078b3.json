@@ -1,0 +1,86 @@
+{
+    "uid": "20250930_171457_7c8078b3",
+    "client": {
+        "timestamp": "2025-09-30T10:14:58.646Z",
+        "location": {
+            "latitude": -6.285223,
+            "longitude": 106.5443072,
+            "accuracy": 16.6299991607666
+        },
+        "device": {
+            "userAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36",
+            "platform": "Linux armv81",
+            "language": "id-ID",
+            "languages": [
+                "id-ID",
+                "id",
+                "en-US",
+                "en"
+            ],
+            "cookieEnabled": true,
+            "doNotTrack": null,
+            "hardwareConcurrency": 8,
+            "deviceMemory": 8,
+            "screen": {
+                "width": 376,
+                "height": 835,
+                "availWidth": 376,
+                "availHeight": 835,
+                "colorDepth": 24,
+                "pixelRatio": 3.25
+            },
+            "window": {
+                "innerWidth": 375,
+                "innerHeight": 728
+            },
+            "timezone": "Asia/Jakarta",
+            "referrer": "",
+            "pageUrl": "https://jcetools.my.id/process/",
+            "webgl": {
+                "vendor": "ARM",
+                "renderer": "Mali-G720 MC7"
+            },
+            "webdriver": false
+        },
+        "elapsedMs": 2585,
+        "botEvalClient": {
+            "signals": {
+                "webdriver": false,
+                "headlessUA": false,
+                "suspiciousUA": false,
+                "hwHuge": false,
+                "noLangs": false,
+                "utcTZ": false,
+                "tinyRes": false,
+                "webglSwift": false,
+                "webglMesa": false,
+                "iosMismatch": false
+            },
+            "score": 0,
+            "suspected": false
+        }
+    },
+    "server": {
+        "request_time": "2025-09-30T17:14:57+07:00",
+        "ip": "139.193.3.57",
+        "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36",
+        "referer": "https://jcetools.my.id/process/"
+    },
+    "derived": {
+        "device_type": "Mobile",
+        "device_os": "Android"
+    },
+    "botEvalServer": {
+        "score": 0,
+        "reasons": [],
+        "suspected": false
+    },
+    "blocked": false,
+    "blockReasons": [],
+    "image_saved": "20250930_171457_7c8078b3.jpg",
+    "fonnte": {
+        "http_code": 200,
+        "error": null,
+        "body": "{\"detail\":\"success! message in queue\",\"id\":[\"123228948\"],\"process\":\"pending\",\"quota\":{\"6281945300897\":{\"details\":\"deduced from total quota\",\"quota\":1261,\"remaining\":1260,\"used\":1}},\"requestid\":116168235,\"status\":true,\"target\":[\"6285157781148\"]}"
+    }
+}

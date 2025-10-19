@@ -28,8 +28,10 @@ if (session_status() === PHP_SESSION_NONE) {
       'samesite' => $samesite
     ];
 
-    if ($host !== '') {
-        $params['domain'] = $host;
+     if ($host !== '') {
+        // Menambahkan titik di depan untuk membuat cookie tersedia
+        // di semua subdomain (misal: www.domain.com dan domain.com)
+        $params['domain'] = '.' . $host;
     }
 
     if (PHP_VERSION_ID >= 70300) {

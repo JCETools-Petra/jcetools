@@ -1,0 +1,681 @@
+[27-Sep-2025 08:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 09:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 09:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 10:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 10:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 11:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 11:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 12:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 12:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 13:00:04 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 13:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 14:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 14:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 15:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 15:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 16:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 16:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 17:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 17:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 18:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 18:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 19:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 19:30:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 20:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 20:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 21:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 21:30:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 22:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 22:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 23:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[27-Sep-2025 23:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 00:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 00:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 01:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 01:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 02:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 02:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 03:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 03:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 04:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 04:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 05:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 05:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 06:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 06:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 07:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 07:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 08:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 08:30:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 09:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 09:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 10:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 10:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 11:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 11:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 12:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 12:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 13:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 13:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 14:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 14:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 15:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 15:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 16:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 16:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 17:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 17:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 18:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 18:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 19:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 19:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 20:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 20:30:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 21:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 21:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 22:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 22:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 23:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[28-Sep-2025 23:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 00:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 00:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 01:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 01:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 02:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 02:30:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 03:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 03:30:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 04:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 04:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 05:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 05:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 06:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 06:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 07:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 07:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 08:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 08:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 09:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 09:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 10:00:34 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 10:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 11:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 11:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 12:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 12:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 13:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 13:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 14:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 14:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 15:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 15:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 16:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 16:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 17:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 17:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 18:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 18:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 19:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 19:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 20:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 20:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 21:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 21:30:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 22:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 22:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 23:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[29-Sep-2025 23:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 00:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 00:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 01:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 01:30:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 02:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 02:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 03:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 03:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 04:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 04:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 05:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 05:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 06:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 06:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 07:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 07:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 08:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 08:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 09:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 09:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 10:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 10:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 11:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 11:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 12:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 12:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 13:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 13:30:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 14:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 14:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 15:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 15:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 16:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 16:30:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 17:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 17:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 18:00:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 18:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 19:00:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 19:21:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 19:22:55 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[30-Sep-2025 19:30:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #3 cannot be passed by reference in /home/apsx2353/public_html/jcetools.my.id/update_location.php:79
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/update_location.php on line 79
+[13-Oct-2025 22:39:05 Asia/Jakarta] PHP Warning:  require_once(/home/apsx2353/public_html/jcetools.my.id/core/db_connect.php): Failed to open stream: No such file or directory in /home/apsx2353/public_html/jcetools.my.id/reset_password_licensed.php on line 9
+[13-Oct-2025 22:39:05 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/apsx2353/public_html/jcetools.my.id/core/db_connect.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/apsx2353/public_html/jcetools.my.id/reset_password_licensed.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/apsx2353/public_html/jcetools.my.id/reset_password_licensed.php on line 9

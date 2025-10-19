@@ -1,0 +1,7 @@
+# Mengizinkan semua bot mengakses seluruh situs
+User-agent: *
+Allow: /
+
+# Melarang semua bot mengakses folder admin
+User-agent: *
+Disallow: /admin/

@@ -1,50 +1,74 @@
 <?php
 session_start();
+// Pastikan hanya admin yang sudah login yang bisa mengakses
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: login.php');
     exit;
 }
 
 require_once __DIR__ . '/core/db_connect.php';
-require_once __DIR__ . '/core/whatsapp_helper.php';
+require_once __DIR__ . '/core/crypto_helper.php'; // Panggil helper dekripsi yang baru
 
-// Ambil template pesan dari database
-$template_result = $conn->query("SELECT message_template FROM admins WHERE username = '{$_SESSION['username']}'");
-$template_row = $template_result->fetch_assoc();
-$pesan = $template_row['message_template'] ?? '';
+// Ambil template pesan dari database berdasarkan admin yang login
+$template_result = $conn->prepare("SELECT message_template FROM admins WHERE username = ?");
+$template_result->bind_param('s', $_SESSION['username']);
+$template_result->execute();
+$template_row = $template_result->get_result()->fetch_assoc();
+$pesan_template = $template_row['message_template'] ?? '';
+$template_result->close();
 
-if (empty($pesan)) {
+// Jika admin tidak memiliki template pesan, kembalikan ke dashboard
+if (empty($pesan_template)) {
     header('Location: dashboard.php?status=template_kosong');
     exit;
 }
 
-// Ambil semua user yang punya nomor telepon valid, termasuk hwid dan expiry_date
-$result = $conn->query("SELECT Nama, phone_number, hwid_encrypted, expiry_date FROM user_jce WHERE phone_number IS NOT NULL AND phone_number != ''");
+// Ambil semua user yang memiliki alamat email yang valid
+$result = $conn->query("SELECT Nama, email, hwid_encrypted, expiry_date FROM user_jce WHERE email IS NOT NULL AND email != '' AND email LIKE '%@%.%'");
 
-$berhasil_kirim = 0;
-$gagal_kirim = 0;
+// Siapkan prepared statement untuk memasukkan email ke dalam antrean
+$stmt = $conn->prepare("INSERT INTO email_queue (email_address, recipient_name, subject, message) VALUES (?, ?, ?, ?)");
 
+// Atur subjek default untuk email massal ini
+$subjek_massal = "Informasi Penting Terkait Lisensi JCE Tools Anda"; 
+
+$jumlah_antrean = 0;
 while ($user = $result->fetch_assoc()) {
-    // Tentukan apakah tanggal kedaluwarsa adalah "Permanent"
-    $expiry_year = (int)date('Y', strtotime($user['expiry_date']));
-    $formatted_expiry_date = ($expiry_year > 2030) ? 'Permanent' : $user['expiry_date'];
-    
-    // Ganti placeholder {nama}, {hwid}, dan {expiry_date}
-    $pesan_personal = str_replace('{nama}', $user['Nama'], $pesan);
-    $pesan_personal = str_replace('{hwid}', $user['hwid_encrypted'], $pesan_personal);
-    $pesan_personal = str_replace('{expiry_date}', $formatted_expiry_date, $pesan_personal);
-
-    if (kirimWhatsApp($user['phone_number'], $pesan_personal)) {
-        $berhasil_kirim++;
-    } else {
-        $gagal_kirim++;
+    // Validasi format email sebelum diproses lebih lanjut
+    if (filter_var($user['email'], FILTER_VALIDATE_EMAIL)) {
+        
+        // ==================================================================
+        // PERUBAHAN UTAMA: Dekripsi HWID sebelum digunakan
+        // ==================================================================
+        $hwid_decrypted = decrypt_hwid($user['hwid_encrypted']);
+        // Jika dekripsi gagal, tampilkan pesan error agar tidak kosong
+        if ($hwid_decrypted === false) {
+            $hwid_decrypted = '[Gagal Mendekripsi HWID]';
+        }
+        // ==================================================================
+        
+        // Format tanggal kedaluwarsa
+        $expiry_year = (int)date('Y', strtotime($user['expiry_date']));
+        $formatted_expiry_date = ($expiry_year > 2030) ? 'Permanent' : date('d F Y H:i', strtotime($user['expiry_date']));
+        
+        // Ganti placeholder di template pesan dengan data pengguna
+        $pesan_personal = str_replace('{nama}', $user['Nama'], $pesan_template);
+        $pesan_personal = str_replace('{hwid}', $hwid_decrypted, $pesan_personal); // Gunakan HWID yang sudah di-dekripsi
+        $pesan_personal = str_replace('{expiry_date}', $formatted_expiry_date, $pesan_personal);
+        
+        // Masukkan data ke dalam tabel antrean email
+        $stmt->bind_param('ssss', $user['email'], $user['Nama'], $subjek_massal, $pesan_personal);
+        $stmt->execute();
+        
+        $jumlah_antrean++;
     }
-    sleep(1); 
 }
 
-$pesan_sukses = "Proses pengiriman selesai. Berhasil: {$berhasil_kirim}. Gagal: {$gagal_kirim}.";
+// Tutup statement dan koneksi database
+$stmt->close();
 $conn->close();
 
-header('Location: dashboard.php?status=kirim_selesai&berhasil='.$berhasil_kirim.'&gagal='.$gagal_kirim);
+// Alihkan kembali ke dashboard dengan pesan sukses
+header('Location: dashboard.php?status=antrean_email_dibuat&total='.$jumlah_antrean);
 exit;
 ?>

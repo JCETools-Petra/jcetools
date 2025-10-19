@@ -1,5 +1,8 @@
 <?php
+// Pastikan baris ini adalah baris PERTAMA di file, tanpa ada spasi atau baris kosong di atasnya.
 session_start();
+
+// Periksa apakah admin belum login, jika ya, arahkan ke halaman login.
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: login.php');
     exit;
@@ -45,7 +48,8 @@ $current_template = $template_result->fetch_assoc()['message_template'] ?? '';
 
 // Logika untuk Pencarian dan Pengurutan User
 $sort_column_user = $_GET['sort_user'] ?? 'id';
-$valid_user_columns = ['id', 'Nama', 'expiry_date', 'last_login', 'phone_number'];
+// MODIFIKASI 1: Tambahkan 'email' ke daftar kolom yang valid untuk diurutkan
+$valid_user_columns = ['id', 'Nama', 'email', 'expiry_date', 'last_login', 'phone_number'];
 if (!in_array($sort_column_user, $valid_user_columns)) {
     $sort_column_user = 'id';
 }
@@ -54,7 +58,8 @@ $search_term = $_GET['search_nama'] ?? '';
 $sql_params = [];
 $sql_types = '';
 
-$sql_users = "SELECT id, Nama, hwid_encrypted, expiry_date, last_login, phone_number FROM user_jce";
+// MODIFIKASI 2: Tambahkan kolom 'email' ke dalam SELECT query
+$sql_users = "SELECT id, Nama, email, hwid_encrypted, expiry_date, last_login, phone_number FROM user_jce";
 
 if (!empty($search_term)) {
     $sql_users .= " WHERE Nama LIKE ?";
@@ -229,8 +234,8 @@ $is_maintenance_on = ($current_maintenance_status === 'on');
     <?php endif; ?>
 
     <div class="content-section">
-        <h2><i class="bi bi-whatsapp"></i> Template Pesan Massal</h2>
-        <p>Edit template pesan yang akan digunakan untuk fitur "Kirim Pesan Massal". Gunakan placeholder <code>{nama}</code> dan <code>{expiry_date}</code> yang akan diganti secara otomatis.</p>
+        <h2><i class="bi bi-envelope"></i> Template Pesan Email Massal</h2>
+        <p>Edit template pesan yang akan digunakan untuk fitur "Kirim Pesan Massal". Gunakan placeholder <code>{nama}</code>, <code>{hwid}</code>, dan <code>{expiry_date}</code> yang akan diganti secara otomatis.</p>
         <form action="dashboard.php" method="POST">
              <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <div class="mb-3">
@@ -285,7 +290,7 @@ $is_maintenance_on = ($current_maintenance_status === 'on');
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2><i class="bi bi-people"></i> Manajemen User (Sistem HWID Lama)</h2>
             <div>
-                <a href="kirim_massal.php" class="btn btn-outline-danger">Kirim Pesan Massal</a>
+                <a href="kirim_massal.php" class="btn btn-outline-danger" onclick="return confirm('Anda yakin ingin mengirim email massal ke semua user yang memiliki email terdaftar? Proses ini berjalan di latar belakang.');">Kirim Pesan Massal</a>
                 <a href="tambah_user.php" class="btn btn-gold">Tambah User Baru</a>
             </div>
         </div>
@@ -304,6 +309,7 @@ $is_maintenance_on = ($current_maintenance_status === 'on');
                     <tr>
                         <th><a href="?sort_user=id" class="text-white">ID</a></th>
                         <th><a href="?sort_user=Nama" class="text-white">Nama</a></th>
+                        <th><a href="?sort_user=email" class="text-white">Email</a></th>
                         <th>HWID</th>
                         <th><a href="?sort_user=phone_number" class="text-white">Nomor Telepon</a></th>
                         <th><a href="?sort_user=expiry_date" class="text-white">Expiry Date</a></th>
@@ -316,10 +322,11 @@ $is_maintenance_on = ($current_maintenance_status === 'on');
                     <tr>
                         <td><?php echo $row['id']; ?></td>
                         <td><?php echo htmlspecialchars($row['Nama']); ?></td>
+                        <td><?php echo htmlspecialchars($row['email'] ?? '-'); ?></td>
                         <td><?php echo htmlspecialchars($row['hwid_encrypted']); ?></td>
-                        <td><?php echo htmlspecialchars($row['phone_number']); ?></td>
+                        <td><?php echo htmlspecialchars($row['phone_number'] ?? '-'); ?></td>
                         <td><?php echo htmlspecialchars($row['expiry_date']); ?></td>
-                        <td><?php echo htmlspecialchars($row['last_login']); ?></td>
+                        <td><?php echo htmlspecialchars($row['last_login'] ?? 'N/A'); ?></td>
                         <td>
                             <a href="edit_user.php?id=<?php echo $row['id']; ?>" class="btn btn-outline-gold btn-sm">Edit</a>
                             <a href="hapus_user.php?id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus user ini?');">Hapus</a>

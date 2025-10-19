@@ -1,17 +1,13 @@
-[20-Sep-2025 13:22:22 Asia/Jakarta] PHP Fatal error:  Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in /home/apsx2353/public_html/jcetools.my.id/admin/edit_produk.php:28
+[13-Oct-2025 23:26:46 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class "PHPMailer\PHPMailer\PHPMailer" not found in /home/apsx2353/public_html/jcetools.my.id/admin/core/email_helper.php:10
 Stack trace:
-#0 /home/apsx2353/public_html/jcetools.my.id/admin/edit_produk.php(28): mysqli_stmt->bind_param()
+#0 /home/apsx2353/public_html/jcetools.my.id/admin/edit_user.php(37): kirimEmail()
 #1 {main}
-  thrown in /home/apsx2353/public_html/jcetools.my.id/admin/edit_produk.php on line 28
-[20-Sep-2025 14:30:07 Asia/Jakarta] PHP Warning:  include(includes/header.php): Failed to open stream: No such file or directory in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 40
-[20-Sep-2025 14:30:07 Asia/Jakarta] PHP Warning:  include(): Failed opening 'includes/header.php' for inclusion (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 40
-[20-Sep-2025 14:30:07 Asia/Jakarta] PHP Warning:  include(includes/footer.php): Failed to open stream: No such file or directory in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 73
-[20-Sep-2025 14:30:07 Asia/Jakarta] PHP Warning:  include(): Failed opening 'includes/footer.php' for inclusion (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 73
-[20-Sep-2025 14:30:09 Asia/Jakarta] PHP Warning:  include(includes/header.php): Failed to open stream: No such file or directory in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 40
-[20-Sep-2025 14:30:09 Asia/Jakarta] PHP Warning:  include(): Failed opening 'includes/header.php' for inclusion (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 40
-[20-Sep-2025 14:30:09 Asia/Jakarta] PHP Warning:  include(includes/footer.php): Failed to open stream: No such file or directory in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 73
-[20-Sep-2025 14:30:09 Asia/Jakarta] PHP Warning:  include(): Failed opening 'includes/footer.php' for inclusion (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 73
-[20-Sep-2025 14:53:41 Asia/Jakarta] PHP Warning:  include(includes/header.php): Failed to open stream: No such file or directory in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 40
-[20-Sep-2025 14:53:41 Asia/Jakarta] PHP Warning:  include(): Failed opening 'includes/header.php' for inclusion (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 40
-[20-Sep-2025 14:53:41 Asia/Jakarta] PHP Warning:  include(includes/footer.php): Failed to open stream: No such file or directory in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 73
-[20-Sep-2025 14:53:41 Asia/Jakarta] PHP Warning:  include(): Failed opening 'includes/footer.php' for inclusion (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/apsx2353/public_html/jcetools.my.id/admin/pengaturan.php on line 73
+  thrown in /home/apsx2353/public_html/jcetools.my.id/admin/core/email_helper.php on line 10
+[13-Oct-2025 23:29:04 Asia/Jakarta] PHP Warning:  Undefined array key "SMTP_HOST" in /home/apsx2353/public_html/jcetools.my.id/admin/core/email_helper.php on line 15
+[13-Oct-2025 23:29:04 Asia/Jakarta] PHP Warning:  Undefined array key "SMTP_USER" in /home/apsx2353/public_html/jcetools.my.id/admin/core/email_helper.php on line 17
+[13-Oct-2025 23:29:04 Asia/Jakarta] PHP Warning:  Undefined array key "SMTP_PASS" in /home/apsx2353/public_html/jcetools.my.id/admin/core/email_helper.php on line 18
+[13-Oct-2025 23:29:04 Asia/Jakarta] PHP Warning:  Undefined array key "SMTP_PORT" in /home/apsx2353/public_html/jcetools.my.id/admin/core/email_helper.php on line 20
+[13-Oct-2025 23:29:04 Asia/Jakarta] PHP Warning:  Undefined array key "SMTP_FROM_EMAIL" in /home/apsx2353/public_html/jcetools.my.id/admin/core/email_helper.php on line 23
+[13-Oct-2025 23:29:04 Asia/Jakarta] PHP Warning:  Undefined array key "SMTP_FROM_NAME" in /home/apsx2353/public_html/jcetools.my.id/admin/core/email_helper.php on line 23
+[13-Oct-2025 23:29:04 Asia/Jakarta] Gagal mengirim email ke petratech1830@gmail.com: Invalid address:  (From): 
+[16-Oct-2025 18:37:12 Asia/Jakarta] Gagal mengirim email ke petratech1830@gmail.com: SMTP Error: Could not connect to SMTP host. Failed to connect to server SMTP server error: Failed to connect to server SMTP code: 110 Additional SMTP info: Connection timed out

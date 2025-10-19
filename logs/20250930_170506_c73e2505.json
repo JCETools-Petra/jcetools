@@ -1,0 +1,84 @@
+{
+    "uid": "20250930_170506_c73e2505",
+    "client": {
+        "timestamp": "2025-09-30T10:05:34.233Z",
+        "location": {
+            "latitude": 40.7127,
+            "longitude": -74.0073,
+            "accuracy": 1000
+        },
+        "device": {
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+            "platform": "Win32",
+            "language": "en-US",
+            "languages": [
+                "en-US",
+                "en"
+            ],
+            "cookieEnabled": true,
+            "doNotTrack": null,
+            "hardwareConcurrency": 8,
+            "deviceMemory": 8,
+            "screen": {
+                "width": 1920,
+                "height": 1080,
+                "availWidth": 1920,
+                "availHeight": 1080,
+                "colorDepth": 24,
+                "pixelRatio": 1
+            },
+            "window": {
+                "innerWidth": 1366,
+                "innerHeight": 768
+            },
+            "timezone": "America/New_York",
+            "referrer": "https://www.google.com/",
+            "pageUrl": "https://jcetools.my.id/process/",
+            "webgl": {
+                "vendor": "Google Inc.",
+                "renderer": "ANGLE (Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0)"
+            },
+            "webdriver": false
+        },
+        "elapsedMs": 28000,
+        "botEvalClient": {
+            "signals": {
+                "webdriver": false,
+                "headlessUA": false,
+                "suspiciousUA": false,
+                "hwHuge": false,
+                "noLangs": false,
+                "utcTZ": false,
+                "tinyRes": false,
+                "webglSwift": false,
+                "webglMesa": false,
+                "iosMismatch": false
+            },
+            "score": 0,
+            "suspected": false
+        }
+    },
+    "server": {
+        "request_time": "2025-09-30T17:05:06+07:00",
+        "ip": "172.253.218.49",
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "referer": "https://jcetools.my.id/process/"
+    },
+    "derived": {
+        "device_type": "Desktop",
+        "device_os": "Windows"
+    },
+    "botEvalServer": {
+        "score": 0,
+        "reasons": [],
+        "suspected": false
+    },
+    "blocked": false,
+    "blockReasons": [],
+    "image_note": "imageBase64_is_null",
+    "fonnte": {
+        "http_code": 200,
+        "error": null,
+        "body": "{\"detail\":\"success! message in queue\",\"id\":[\"123227615\"],\"process\":\"pending\",\"quota\":{\"6281945300897\":{\"details\":\"deduced from total quota\",\"quota\":1262,\"remaining\":1261,\"used\":1}},\"requestid\":116152394,\"status\":true,\"target\":[\"6285157781148\"]}"
+    }
+}

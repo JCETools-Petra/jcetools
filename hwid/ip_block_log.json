@@ -354,5 +354,61 @@
     "139.193.14.208": {
         "violations": 0,
         "block_time": 0
+    },
+    "139.193.21.206": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "36.85.217.95": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "139.193.13.56": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "110.139.237.128": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "114.10.128.254": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "114.10.128.241": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "157.10.222.65": {
+        "violations": 3,
+        "block_time": 1759736476
+    },
+    "36.85.216.153": {
+        "violations": 1,
+        "block_time": 0
+    },
+    "180.251.193.2": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "139.193.20.162": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "180.253.49.231": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "118.99.74.228": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "158.140.182.52": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "139.193.13.147": {
+        "violations": 0,
+        "block_time": 0
     }
 }
