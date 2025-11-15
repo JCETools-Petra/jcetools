@@ -410,5 +410,21 @@
     "139.193.13.147": {
         "violations": 0,
         "block_time": 0
+    },
+    "182.1.135.221": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "158.140.182.13": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "158.140.182.62": {
+        "violations": 0,
+        "block_time": 0
+    },
+    "125.166.200.167": {
+        "violations": 0,
+        "block_time": 0
     }
 }

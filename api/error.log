@@ -412,3 +412,32 @@ Stack trace:
 [18-Oct-2025 17:27:26 Asia/Jakarta] HWID not found: 5bf9ca51225a82a188805e77a2211a7c
 [18-Oct-2025 17:35:03 Asia/Jakarta] HWID not found: 5bf9ca51225a82a188805e77a2211a7c
 [18-Oct-2025 17:36:55 Asia/Jakarta] HWID not found: 5bf9ca51225a82a188805e77a2211a7c
+[2025-10-22 15:33:45] | IP: 103.133.24.243 | Database connection failed: Connection refused
+[25-Oct-2025 00:17:04 Asia/Jakarta] HWID not found: 5a76e066f576318024ba94783c239cfb
+[01-Nov-2025 14:40:57 Asia/Jakarta] HWID not found: 45713c09c529242dd2f56fbbda99b7bf
+[03-Nov-2025 01:21:06 Asia/Jakarta] HWID expired: 268494798bdee0fddcf273319848641b
+[03-Nov-2025 01:21:25 Asia/Jakarta] HWID expired: 268494798bdee0fddcf273319848641b
+[09-Nov-2025 17:23:23 Asia/Jakarta] HWID expired: d87065073d95164c47c6998e2a29a0da
+[09-Nov-2025 17:25:23 Asia/Jakarta] HWID expired: d87065073d95164c47c6998e2a29a0da
+[09-Nov-2025 19:09:12 Asia/Jakarta] HWID expired: d87065073d95164c47c6998e2a29a0da
+[11-Nov-2025 15:40:14 Asia/Jakarta] HWID not found: c362251d77448798e76fa6f3314f7679
+[11-Nov-2025 16:51:30 Asia/Jakarta] HWID not found: 00f982d5de5064c2feb8e81c848ed7b4
+[12-Nov-2025 11:25:07 Asia/Jakarta] HWID not found: 0ed0a1638a0cd8ee950620ce12219ded
+[12-Nov-2025 11:27:07 Asia/Jakarta] HWID not found: 0ed0a1638a0cd8ee950620ce12219ded
+[12-Nov-2025 12:53:29 Asia/Jakarta] HWID not found: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:03:15 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:03:35 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:04:33 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:04:53 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:06:11 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:08:28 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:09:19 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:10:54 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:12:23 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:19:15 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:21:31 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:30:06 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[12-Nov-2025 13:32:09 Asia/Jakarta] HWID expired: 6d5fde95a4293ac267b9aed87d881f0c
+[14-Nov-2025 00:12:51 Asia/Jakarta] HWID expired: 14be2d1e4f21103009d56b89d3ea9dc2
+[14-Nov-2025 00:14:51 Asia/Jakarta] HWID expired: 14be2d1e4f21103009d56b89d3ea9dc2
+[14-Nov-2025 22:06:18 Asia/Jakarta] HWID expired: 04a1f18c47c3aa0cfdee3ec304d9313b

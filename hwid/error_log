@@ -739,3 +739,13 @@ Stack trace:
 [16-Oct-2025 14:58:43 Asia/Jakarta] [2025-10-16 14:58:43] Gagal mengirim email: Alamat email pengguna kosong.
 [17-Oct-2025 22:19:52 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
 [17-Oct-2025 22:19:52 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[01-Nov-2025 14:43:05 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[01-Nov-2025 14:43:05 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[11-Nov-2025 15:41:51 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[11-Nov-2025 15:41:51 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[11-Nov-2025 15:41:51 Asia/Jakarta] [2025-11-11 15:41:51] Gagal mengirim email: Alamat email pengguna kosong.
+[11-Nov-2025 16:51:47 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[11-Nov-2025 16:51:47 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[11-Nov-2025 16:51:47 Asia/Jakarta] [2025-11-11 16:51:47] Gagal mengirim email: Alamat email pengguna kosong.
+[12-Nov-2025 11:27:35 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
+[12-Nov-2025 11:27:35 Asia/Jakarta] PHP Warning:  openssl_encrypt(): IV passed is only 12 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0 in /home/apsx2353/public_html/jcetools.my.id/hwid/process.php on line 78
