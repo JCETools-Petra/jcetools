@@ -1,0 +1,84 @@
+# ==============================================================================
+# KONFIGURASI .HTACCESS POWERFULL UNTUK JCE TOOLS API
+# Dibuat pada: 11 September 2025
+# ==============================================================================
+
+# Menonaktifkan tanda tangan server untuk menyembunyikan versi Apache/PHP
+ServerSignature Off
+
+# ------------------------------------------------------------------------------
+# [KEAMANAN] Mencegah Directory Listing
+# ------------------------------------------------------------------------------
+# Mencegah siapa pun melihat daftar file jika tidak ada file index.
+Options -Indexes
+
+# ------------------------------------------------------------------------------
+# [KEAMANAN] Perlindungan File Sensitif
+# ------------------------------------------------------------------------------
+# Blokir akses ke file-file konfigurasi, log, dan file .htaccess ini sendiri.
+<Files ~ "^\.(htaccess|htpasswd|env|ini|log|sh|config|sql)$">
+    Require all denied
+</Files>
+
+# Blokir akses ke direktori Composer
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^vendor/ - [F,L]
+</IfModule>
+
+# ------------------------------------------------------------------------------
+# [KEAMANAN] Wajibkan HTTPS
+# ------------------------------------------------------------------------------
+# Mengalihkan semua request HTTP ke HTTPS untuk enkripsi.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ------------------------------------------------------------------------------
+# [Fungsionalitas] Aturan URL (URL Rewriting)
+# ------------------------------------------------------------------------------
+# Mengizinkan akses langsung ke file yang ada (seperti .exe dan .txt).
+# Jika file atau direktori tidak ditemukan, semua permintaan akan diarahkan 
+# ke 'jcetools-check.php' untuk diproses.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Izinkan akses langsung jika file atau direktori benar-benar ada
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Arahkan semua request lain ke skrip utama PHP
+    RewriteRule ^(.*)$ jcetools-check.php [L,QSA]
+</IfModule>
+
+# ------------------------------------------------------------------------------
+# [KEAMANAN] HTTP Security Headers
+# ------------------------------------------------------------------------------
+# Menambahkan lapisan keamanan di sisi browser klien.
+<IfModule mod_headers.c>
+    # Mencegah browser menebak tipe konten (MIME sniffing)
+    Header set X-Content-Type-Options "nosniff"
+    
+    # Mencegah website Anda ditampilkan dalam frame/iframe di situs lain (Clickjacking)
+    Header set X-Frame-Options "DENY"
+    
+    # Mengaktifkan proteksi XSS di browser
+    Header set X-XSS-Protection "1; mode=block"
+    
+    # Memberi tahu browser untuk selalu menggunakan HTTPS (HSTS)
+    # Aktifkan baris di bawah ini HANYA JIKA Anda yakin 100% website selalu HTTPS
+    # Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# ------------------------------------------------------------------------------
+# [KEAMANAN] Mencegah Hotlinking
+# ------------------------------------------------------------------------------
+# Mencegah situs lain menampilkan file .exe Anda secara langsung dan mencuri bandwidth.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_REFERER} !^$
+    RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?jcetools.my.id [NC]
+    RewriteRule \.(exe)$ - [F]
+</IfModule>
