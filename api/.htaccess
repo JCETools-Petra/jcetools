@@ -40,15 +40,21 @@ Options -Indexes
 # [Fungsionalitas] Aturan URL (URL Rewriting)
 # ------------------------------------------------------------------------------
 # Mengizinkan akses langsung ke file yang ada (seperti .exe dan .txt).
-# Jika file atau direktori tidak ditemukan, semua permintaan akan diarahkan 
+# Jika file atau direktori tidak ditemukan, semua permintaan akan diarahkan
 # ke 'jcetools-check.php' untuk diproses.
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    
+
+    # [PERBAIKAN] Exclude API endpoints dari rewrite
+    # Izinkan akses langsung ke folder /test/ dan /auth/ (API endpoints)
+    RewriteCond %{REQUEST_URI} !^/api/test/
+    RewriteCond %{REQUEST_URI} !^/api/auth/
+    RewriteCond %{REQUEST_URI} !^/api/utils/
+
     # Izinkan akses langsung jika file atau direktori benar-benar ada
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    
+
     # Arahkan semua request lain ke skrip utama PHP
     RewriteRule ^(.*)$ jcetools-check.php [L,QSA]
 </IfModule>
