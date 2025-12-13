@@ -78,17 +78,18 @@ $payload = [
 $token = $tokenManager->generateToken($payload);
 
 // Store session in database for validation
-$stmt = $conn->prepare(
-    "INSERT INTO session_keys (session_id, session_key, session_iv, client_ip, expires_at)
-     VALUES (?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))
-     ON DUPLICATE KEY UPDATE
-        session_key = VALUES(session_key),
-        session_iv = VALUES(session_iv),
-        expires_at = VALUES(expires_at)"
-);
-
-if (!$stmt) {
-    // Table might not exist, create it
+$stmt = null;
+try {
+    $stmt = $conn->prepare(
+        "INSERT INTO session_keys (session_id, session_key, session_iv, client_ip, expires_at)
+         VALUES (?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))
+         ON DUPLICATE KEY UPDATE
+            session_key = VALUES(session_key),
+            session_iv = VALUES(session_iv),
+            expires_at = VALUES(expires_at)"
+    );
+} catch (mysqli_sql_exception $e) {
+    // Table doesn't exist, create it
     $createTable = "CREATE TABLE IF NOT EXISTS session_keys (
         id INT AUTO_INCREMENT PRIMARY KEY,
         session_id VARCHAR(64) UNIQUE NOT NULL,
@@ -99,9 +100,12 @@ if (!$stmt) {
         expires_at TIMESTAMP NOT NULL,
         INDEX idx_session_id (session_id),
         INDEX idx_expires (expires_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
 
-    $conn->query($createTable);
+    if (!$conn->query($createTable)) {
+        http_response_code(500);
+        die(json_encode(["error" => "Failed to create session_keys table"]));
+    }
 
     // Retry insert
     $stmt = $conn->prepare(

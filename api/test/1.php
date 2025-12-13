@@ -117,24 +117,31 @@ if ($tokenPayload === false) {
 
 // Verify session exists in database
 $sessionId = $tokenPayload['session_id'] ?? '';
-$stmt = $conn->prepare(
-    "SELECT session_key, session_iv FROM session_keys
-     WHERE session_id = ? AND expires_at > NOW() AND client_ip = ?"
-);
-$stmt->bind_param('ss', $sessionId, $clientIp);
-$stmt->execute();
-$result = $stmt->get_result();
+try {
+    $stmt = $conn->prepare(
+        "SELECT session_key, session_iv FROM session_keys
+         WHERE session_id = ? AND expires_at > NOW() AND client_ip = ?"
+    );
+    $stmt->bind_param('ss', $sessionId, $clientIp);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-if ($result->num_rows === 0) {
-    log_message('intruder', "Session not found or expired: $sessionId from IP: $clientIp");
-    http_response_code(401);
+    if ($result->num_rows === 0) {
+        log_message('intruder', "Session not found or expired: $sessionId from IP: $clientIp");
+        http_response_code(401);
+        $stmt->close();
+        $conn->close();
+        die(json_encode(["status" => "error", "message" => "Session expired. Please request new session."]));
+    }
+
+    $session = $result->fetch_assoc();
     $stmt->close();
+} catch (mysqli_sql_exception $e) {
+    log_message('error', "Session validation failed (table may not exist): " . $e->getMessage());
+    http_response_code(500);
     $conn->close();
-    die(json_encode(["status" => "error", "message" => "Session expired. Please request new session."]));
+    die(json_encode(["status" => "error", "message" => "Session validation error. Please request a new session from /api/auth/get-session-key.php"]));
 }
-
-$session = $result->fetch_assoc();
-$stmt->close();
 
 // Process HWID input
 $input = file_get_contents("php://input");
