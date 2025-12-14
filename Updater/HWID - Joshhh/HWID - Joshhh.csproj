@@ -7,7 +7,7 @@
     <ProjectGuid>{243BA027-3367-4930-B168-D35C2D57F542}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>HWID___Joshhh</RootNamespace>
-    <AssemblyName>Hack Updater v.1.4</AssemblyName>
+    <AssemblyName>Hack Updater v.1.5</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -262,6 +262,9 @@
       <HintPath>..\packages\System.Xml.ReaderWriter.4.3.0\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Tulpep.NotificationWindow, Version=1.1.38.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Tulpep.NotificationWindow.1.1.38\lib\net40\Tulpep.NotificationWindow.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

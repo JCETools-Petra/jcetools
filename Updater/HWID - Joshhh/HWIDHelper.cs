@@ -4,59 +4,69 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-public static class HWIDHelper
+namespace HWID___Joshhh
 {
-    public static uint GetVolumeSerialNumberFromCurrentDrive()
+    public static class HWIDHelper
     {
-        string driveLetter = Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory);
-        if (string.IsNullOrEmpty(driveLetter))
+        public static uint GetVolumeSerialNumberFromCurrentDrive()
         {
-            FileLogger.Log("Gagal mendapatkan path drive root.");
-            MessageBox.Show("Gagal mengidentifikasi drive aplikasi.", "Error Kritis", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            // LOGIKA 1: Ambil Path EXE (Sama seperti GetModuleFileNameA di C++)
+            string exePath = Application.ExecutablePath;
+            string driveLetter = Path.GetPathRoot(exePath);
+
+            // Pastikan formatnya "C:\" (C++ mengambil char pertama + ":\\")
+            if (string.IsNullOrEmpty(driveLetter)) return 0;
+            if (!driveLetter.EndsWith("\\")) driveLetter += "\\";
+
+            uint serialNumber = 0;
+            uint maxComponentLength;
+            uint fileSystemFlags;
+            StringBuilder volumeName = new StringBuilder(261);
+            StringBuilder fileSystemName = new StringBuilder(261);
+
+            // LOGIKA 2: Panggil API Windows Mode ANSI
+            // Ini kunci agar hasilnya sama dengan Injector
+            if (GetVolumeInformation(
+                driveLetter,
+                volumeName,
+                (uint)volumeName.Capacity,
+                ref serialNumber,
+                out maxComponentLength,
+                out fileSystemFlags,
+                fileSystemName,
+                (uint)fileSystemName.Capacity))
+            {
+                return serialNumber;
+            }
+
             return 0;
         }
 
-        uint serialNumber = 0;
-        if (GetVolumeInformation(driveLetter, null, 0, ref serialNumber, out _, out _, null, 0))
+        public static void DisplayVolumeSerialNumber()
         {
-            return serialNumber;
+            uint serialNumber = GetVolumeSerialNumberFromCurrentDrive();
+            if (serialNumber == 0) return;
+
+            // Simpan log untuk debugging
+            try
+            {
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "hwid-log.txt");
+                File.WriteAllText(filePath, "HWID: " + serialNumber.ToString());
+            }
+            catch { }
         }
-        else
-        {
-            FileLogger.Log("Gagal mendapatkan informasi volume drive.");
-            MessageBox.Show("Gagal mendapatkan HWID dari sistem.", "Error Kritis", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return 0;
-        }
+
+        // PENTING: CharSet.Ansi (Ini yang menyamakan dengan C++)
+        [DllImport("kernel32.dll", EntryPoint = "GetVolumeInformationA", ExactSpelling = true, SetLastError = true, CharSet = CharSet.Ansi)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetVolumeInformation(
+           string lpRootPathName,
+           StringBuilder lpVolumeNameBuffer,
+           uint nVolumeNameSize,
+           ref uint lpVolumeSerialNumber,
+           out uint lpMaximumComponentLength,
+           out uint lpFileSystemFlags,
+           StringBuilder lpFileSystemNameBuffer,
+           uint nFileSystemNameSize);
     }
-
-    public static void DisplayVolumeSerialNumber()
-    {
-        uint serialNumber = GetVolumeSerialNumberFromCurrentDrive();
-        if (serialNumber == 0) return;
-
-        string hwidString = serialNumber.ToString();
-        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "hwid-log.txt");
-
-        try
-        {
-            File.WriteAllText(filePath, "HWID: " + hwidString);
-        }
-        catch (Exception)
-        {
-            FileLogger.Log("Gagal menulis file hwid-log.txt.");
-            MessageBox.Show("Gagal menyimpan file HWID. Pastikan aplikasi memiliki izin tulis.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetVolumeInformation(
-       string lpRootPathName,
-       StringBuilder lpVolumeNameBuffer,
-       uint nVolumeNameSize,
-       ref uint lpVolumeSerialNumber,
-       out uint lpMaximumComponentLength,
-       out uint lpFileSystemFlags,
-       StringBuilder lpFileSystemNameBuffer,
-       uint nFileSystemNameSize);
 }
