@@ -1,0 +1,5 @@
+================ JCE TOOLS ERROR LOG ================
+Waktu           : 2025-09-10 21:35:14
+Kode Error      : 106
+Deskripsi       : File 'Audition.exe' tidak ditemukan.
+=====================================================

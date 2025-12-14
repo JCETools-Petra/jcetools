@@ -1,0 +1,12 @@
+2025-09-10 21:33:03 | Aplikasi JCE Tools dimulai.
+2025-09-10 21:33:03 | [FATAL ERROR] Debugger terdeteksi.
+2025-09-10 21:34:00 | Aplikasi JCE Tools dimulai.
+2025-09-10 21:34:00 | [FATAL ERROR] File 'jcetools.dll' tidak ditemukan.
+2025-09-10 21:34:34 | Aplikasi JCE Tools dimulai.
+2025-09-10 21:34:34 | Memulai verifikasi HWID...
+2025-09-10 21:34:35 | Verifikasi HWID berhasil. Kedaluwarsa: 3018-03-18 18:30:00
+2025-09-10 21:34:36 | [FATAL ERROR] File 'Audition.exe' tidak ditemukan.
+2025-09-10 21:35:12 | Aplikasi JCE Tools dimulai.
+2025-09-10 21:35:12 | Memulai verifikasi HWID...
+2025-09-10 21:35:13 | Verifikasi HWID berhasil. Kedaluwarsa: 3018-03-18 18:30:00
+2025-09-10 21:35:14 | [FATAL ERROR] File 'Audition.exe' tidak ditemukan.

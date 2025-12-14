@@ -1,0 +1,13 @@
+# Visual Studio temporary files
+.vs/
+*.ipch
+*.db
+*.sdf
+*.opensdf
+
+# Build folders
+Debug/
+Release/
+x64/
+/bin/
+/obj/
