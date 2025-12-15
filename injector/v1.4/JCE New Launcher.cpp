@@ -119,7 +119,9 @@ struct Config {
     static const std::string SESSION_CHECK_API_URL;
     static const std::string PAYLOAD_SECRET_KEY;
     static const std::wstring TARGET_PROCESS;
+    static const std::wstring LAUNCH_ARGS;
     static const std::wstring TARGET_DLL;
+    static const std::wstring TARGET_WINDOW_TITLE;
 
     static constexpr long CONNECT_TIMEOUT = 30L;
     static constexpr long REQUEST_TIMEOUT = 45L;
@@ -129,9 +131,9 @@ struct Config {
     static constexpr int MAX_FAILED_CHECKS = 3;
 };
 
-const std::string Config::CURRENT_VERSION = "1.1";
+const std::string Config::CURRENT_VERSION = "1.5";
 const std::string Config::VERSION_URL = OBFUSCATE("https://jcetools.my.id/api/version.txt");
-const std::string Config::UPDATE_URL = OBFUSCATE("https://jcetools.my.id/api/JCE_Launcher_v1.0.exe");
+const std::string Config::UPDATE_URL = OBFUSCATE("https://jcetools.my.id/api/JCE_Launcher_v1.6.exe");
 const std::string Config::API_URL = OBFUSCATE("https://jcetools.my.id/api/1.php");
 const std::string Config::SESSION_KEY_URL = OBFUSCATE("https://jcetools.my.id/api/auth/get-session-key.php");
 const std::string Config::LOGIN_API_URL = OBFUSCATE("https://jcetools.my.id/api/session_login.php");
@@ -139,6 +141,32 @@ const std::string Config::SESSION_CHECK_API_URL = OBFUSCATE("https://jcetools.my
 const std::string Config::PAYLOAD_SECRET_KEY = OBFUSCATE("JCE-5981938591067384910264058215");
 const std::wstring Config::TARGET_PROCESS = OBFUSCATE(L"Audition.exe");
 const std::wstring Config::TARGET_DLL = OBFUSCATE(L"jcetools.dll");
+const std::wstring Config::TARGET_WINDOW_TITLE = OBFUSCATE(L"Audition");
+const std::wstring Config::LAUNCH_ARGS = OBFUSCATE(L"/t3enter 19007B2D55244A7710564371116B1D6E4F28636B4010781E7D IN");
+
+
+class HandleWrapper {
+private:
+    HANDLE m_handle;
+public:
+    HandleWrapper(HANDLE handle = NULL) : m_handle(handle) {}
+    ~HandleWrapper() {
+        if (m_handle && m_handle != INVALID_HANDLE_VALUE) CloseHandle(m_handle);
+    }
+    HandleWrapper(const HandleWrapper&) = delete;
+    HandleWrapper& operator=(const HandleWrapper&) = delete;
+    HandleWrapper(HandleWrapper&& other) noexcept : m_handle(other.m_handle) { other.m_handle = NULL; }
+    HandleWrapper& operator=(HandleWrapper&& other) noexcept {
+        if (this != &other) {
+            if (m_handle && m_handle != INVALID_HANDLE_VALUE) CloseHandle(m_handle);
+            m_handle = other.m_handle;
+            other.m_handle = NULL;
+        }
+        return *this;
+    }
+    operator HANDLE() const { return m_handle; }
+    HANDLE get() const { return m_handle; }
+};
 
 // =================================================================================
 // HELPER FORWARD DECLARATIONS
@@ -728,6 +756,136 @@ void BackgroundThread() {
         else { fails = 0; }
     }
 }
+void HideConsole() {
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
+}
+
+bool InjectDLL(DWORD processID, const std::wstring& dllPath) {
+    HandleWrapper hProcess(OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID));
+    if (!hProcess) {
+        ShowFriendlyError(L"Injeksi DLL gagal: Tidak dapat membuka proses target.", 501, true);
+        return false;
+    }
+
+    // PERBAIKAN: Menghitung ukuran dengan benar
+    SIZE_T dllPathSize = (dllPath.length() + 1) * sizeof(wchar_t);
+    LPVOID pDllPathRemote = VirtualAllocEx(hProcess, NULL, dllPathSize, MEM_COMMIT, PAGE_READWRITE);
+
+    if (!pDllPathRemote) {
+        ShowFriendlyError(L"Injeksi DLL gagal: Alokasi memori gagal.", 502, true);
+        return false;
+    }
+
+    if (!WriteProcessMemory(hProcess, pDllPathRemote, dllPath.c_str(), dllPathSize, NULL)) {
+        ShowFriendlyError(L"Injeksi DLL gagal: Tidak dapat menulis ke memori proses.", 503, true);
+        VirtualFreeEx(hProcess, pDllPathRemote, 0, MEM_RELEASE);
+        return false;
+    }
+
+    // PERBAIKAN: GetModuleHandle dengan NULL check
+    HMODULE hKernel32 = GetModuleHandleW(L"kernel32.dll");
+    if (!hKernel32) {
+        ShowFriendlyError(L"Injeksi DLL gagal: Tidak dapat memuat kernel32.dll.", 505, true);
+        VirtualFreeEx(hProcess, pDllPathRemote, 0, MEM_RELEASE);
+        return false;
+    }
+
+    FARPROC pLoadLibraryW = GetProcAddress(hKernel32, "LoadLibraryW");
+    if (!pLoadLibraryW) {
+        ShowFriendlyError(L"Injeksi DLL gagal: Tidak dapat menemukan LoadLibraryW.", 506, true);
+        VirtualFreeEx(hProcess, pDllPathRemote, 0, MEM_RELEASE);
+        return false;
+    }
+
+    HandleWrapper hRemoteThread(CreateRemoteThread(hProcess, NULL, 0,
+        (LPTHREAD_START_ROUTINE)pLoadLibraryW, pDllPathRemote, 0, NULL));
+
+    if (!hRemoteThread) {
+        ShowFriendlyError(L"Injeksi DLL gagal: Tidak dapat membuat remote thread.", 504, true);
+        VirtualFreeEx(hProcess, pDllPathRemote, 0, MEM_RELEASE);
+        return false;
+    }
+
+    WaitForSingleObject(hRemoteThread, INFINITE);
+    VirtualFreeEx(hProcess, pDllPathRemote, 0, MEM_RELEASE);
+    return true;
+}
+
+std::wstring GetExecutablePath(const std::wstring& executableName) {
+    wchar_t buffer[MAX_PATH];
+    GetModuleFileNameW(NULL, buffer, MAX_PATH);
+    PathRemoveFileSpecW(buffer);
+    return std::wstring(buffer) + L"\\" + executableName;
+}
+
+void LaunchAndInject() {
+    std::wstring auditionExePath = GetExecutablePath(Config::TARGET_PROCESS);
+    if (!PathFileExistsW(auditionExePath.c_str())) {
+        ShowFriendlyError(L"Audition.exe tidak ditemukan. Harap letakkan launcher di folder game.", 401, true);
+    }
+
+    TerminateProcessByName(Config::TARGET_PROCESS);
+    Sleep(1000);
+
+    // PERBAIKAN: Initialize PROCESS_INFORMATION dengan ZeroMemory
+    STARTUPINFOW si;
+    PROCESS_INFORMATION pi;
+    ZeroMemory(&si, sizeof(si));
+    ZeroMemory(&pi, sizeof(pi));
+    si.cb = sizeof(si);
+
+    wchar_t fullCommand[1024];
+    swprintf_s(fullCommand, _countof(fullCommand), L"\"%s\" %s", auditionExePath.c_str(), Config::LAUNCH_ARGS.c_str());
+
+    if (!CreateProcessW(NULL, fullCommand, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+        ShowFriendlyError(L"Gagal memulai Audition.exe. Coba jalankan sebagai Administrator.", 402, true);
+        return;
+    }
+
+    HWND hAuditionWindow = NULL;
+    for (int i = 0; i < 30; ++i) {
+        hAuditionWindow = FindWindowW(NULL, Config::TARGET_WINDOW_TITLE.c_str());
+        if (hAuditionWindow != NULL) break;
+        Sleep(500);
+    }
+
+    if (hAuditionWindow == NULL) {
+        ShowFriendlyError(L"Gagal menemukan jendela game. Game mungkin crash saat dimulai.", 403, true);
+        if (pi.hProcess) {
+            TerminateProcess(pi.hProcess, 1);
+            CloseHandle(pi.hProcess);
+        }
+        if (pi.hThread) CloseHandle(pi.hThread);
+        return;
+    }
+
+    std::wstring fullDllPath = GetExecutablePath(Config::TARGET_DLL);
+    if (!PathFileExistsW(fullDllPath.c_str())) {
+        ShowFriendlyError(L"File pendukung (DLL) tidak ditemukan.", 404, true);
+        if (pi.hProcess) {
+            TerminateProcess(pi.hProcess, 1);
+            CloseHandle(pi.hProcess);
+        }
+        if (pi.hThread) CloseHandle(pi.hThread);
+        return;
+    }
+
+    if (InjectDLL(pi.dwProcessId, fullDllPath)) {
+        Sleep(1500);
+        HideConsole();
+    }
+    else {
+        if (pi.hProcess) {
+            TerminateProcess(pi.hProcess, 1);
+            CloseHandle(pi.hProcess);
+        }
+        if (pi.hThread) CloseHandle(pi.hThread);
+        exit(1);
+    }
+
+    if (pi.hProcess) CloseHandle(pi.hProcess);
+    if (pi.hThread) CloseHandle(pi.hThread);
+}
 
 // =================================================================================
 // ENTRY POINT
@@ -753,20 +911,38 @@ int main() {
     CheckForUpdates();
     InitialCheck();
 
-    std::wcout << L"\n  [INFO] Launcher berjalan di latar belakang...\n";
+    LaunchAndInject();
+
     Sleep(3000);
-    // HideConsole(); 
+    HideConsole(); 
 
     std::thread bgThread(BackgroundThread);
     while (g_isRunning) {
+        bool isGameRunning = false; // Penanda apakah game masih jalan
+
         HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-        PROCESSENTRY32W pe; pe.dwSize = sizeof(pe);
-        if (Process32FirstW(hSnap, &pe)) {
-            do { if (wcscmp(pe.szExeFile, Config::TARGET_PROCESS.c_str()) == 0) { break; } } while (Process32NextW(hSnap, &pe));
+        if (hSnap != INVALID_HANDLE_VALUE) {
+            PROCESSENTRY32W pe; pe.dwSize = sizeof(pe);
+            if (Process32FirstW(hSnap, &pe)) {
+                do {
+                    // Cek apakah nama proses sama dengan Audition.exe
+                    if (wcscmp(pe.szExeFile, Config::TARGET_PROCESS.c_str()) == 0) {
+                        isGameRunning = true; // Game ditemukan!
+                        break;
+                    }
+                } while (Process32NextW(hSnap, &pe));
+            }
+            CloseHandle(hSnap);
         }
-        CloseHandle(hSnap);
-        Sleep(5000);
+
+        // Jika game TIDAK ditemukan, matikan launcher
+        if (!isGameRunning) {
+            g_isRunning = false; // Ini akan menghentikan loop BackgroundThread juga
+        }
+
+        Sleep(5000); // Cek setiap 5 detik
     }
+
     if (bgThread.joinable()) bgThread.join();
     return 0;
 }

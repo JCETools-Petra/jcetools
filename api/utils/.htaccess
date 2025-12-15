@@ -1,0 +1,3 @@
+# Blokir SEMUA akses HTTP langsung ke folder ini
+Order Deny,Allow
+Deny from all

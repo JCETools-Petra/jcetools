@@ -137,11 +137,11 @@
             this.lblVersion.AutoSize = true;
             this.lblVersion.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblVersion.ForeColor = System.Drawing.Color.White;
-            this.lblVersion.Location = new System.Drawing.Point(617, 7);
+            this.lblVersion.Location = new System.Drawing.Point(601, 7);
             this.lblVersion.Name = "lblVersion";
-            this.lblVersion.Size = new System.Drawing.Size(50, 13);
+            this.lblVersion.Size = new System.Drawing.Size(30, 13);
             this.lblVersion.TabIndex = 2;
-            this.lblVersion.Text = "v.2.0 Pro";
+            this.lblVersion.Text = "v.1.5";
             // 
             // lblStatus
             // 
