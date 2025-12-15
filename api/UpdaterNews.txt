@@ -1,0 +1,4 @@
++ Perbaikan UI.
++ Patch Security System.
++ Perbaikan Injector.
++ Jalankan Audition dengan "JCE Launcher v1.5.exe" bukan yang lain.

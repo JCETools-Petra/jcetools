@@ -97,7 +97,6 @@ namespace HWID___Joshhh
             // Tes Koneksi Internet
             if (!await InternetHelper.CheckInternetConnectionAsync())
             {
-                // CLEAN: Tidak ada lagi pesan "DEBUG"
                 ToastHelper.ShowError("Koneksi Error", "Tidak ada koneksi internet. Periksa jaringan Anda.");
                 SetInvalidHwidUI();
             }
@@ -108,7 +107,7 @@ namespace HWID___Joshhh
         }
 
         // =========================================================================
-        // LOGIKA UTAMA (SUDAH DIBERSIHKAN DARI LOG DEBUG KASAR)
+        // LOGIKA UTAMA
         // =========================================================================
 
         private async Task InitializeUserSessionAsync()
@@ -129,7 +128,6 @@ namespace HWID___Joshhh
                 string sessionToken = await GetSessionTokenAsync();
                 if (string.IsNullOrEmpty(sessionToken))
                 {
-                    // CLEAN: Pesan lebih sopan
                     lblStatus.Text = "Gagal terhubung ke server auth.";
                     SetInvalidHwidUI(); return;
                 }
@@ -160,7 +158,6 @@ namespace HWID___Joshhh
                 }
                 catch
                 {
-                    // Jika respon bukan JSON (misal HTML error page), jangan crash, anggap gagal
                     SetInvalidHwidUI(); return;
                 }
 
@@ -173,7 +170,6 @@ namespace HWID___Joshhh
 
                     SetValidHwidUI(jsonResponse);
 
-                    // Suara notifikasi Windows standar
                     System.Media.SystemSounds.Asterisk.Play();
                 }
                 else
@@ -185,7 +181,6 @@ namespace HWID___Joshhh
             }
             catch (Exception)
             {
-                // CLEAN: Jangan tampilkan ex.Message raw ke user
                 ToastHelper.ShowError("Aplikasi Error", "Terjadi kesalahan sistem. Silakan restart aplikasi.");
                 SetInvalidHwidUI();
             }
@@ -196,7 +191,6 @@ namespace HWID___Joshhh
             try
             {
                 var response = await httpClient.GetStringAsync(SessionKeyUrl);
-                // Cek HTML error secara diam-diam
                 if (response.Trim().StartsWith("<")) return null;
 
                 var json = JObject.Parse(response);
@@ -278,7 +272,7 @@ namespace HWID___Joshhh
 
                 var response = await httpClient.PostAsync(HwidCheckUrl, content);
 
-                if (!response.IsSuccessStatusCode) return null; // CLEAN: Tidak ada MessageBox error code
+                if (!response.IsSuccessStatusCode) return null;
 
                 return await response.Content.ReadAsStringAsync();
             }
@@ -379,6 +373,26 @@ namespace HWID___Joshhh
             });
         }
 
+        // =========================================================
+        // FUNGSI UNTUK MEMATIKAN PROCESS YANG SEDANG BERJALAN
+        // =========================================================
+        private void KillRunningInjector(string processNameWithoutExtension)
+        {
+            try
+            {
+                Process[] processes = Process.GetProcessesByName(processNameWithoutExtension);
+                foreach (Process proc in processes)
+                {
+                    proc.Kill();
+                    proc.WaitForExit(1000);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Gagal mematikan proses: " + ex.Message);
+            }
+        }
+
         // --- FITUR UTAMA LAINNYA ---
         private async Task ButtonDownloadUser_Click()
         {
@@ -388,6 +402,27 @@ namespace HWID___Joshhh
 
         private async Task DownloadFromS3()
         {
+            // 1. Matikan Injector jika masih berjalan
+            KillRunningInjector("JCE Launcher v1.5");
+
+            // 2. [FIX PENTING] Hapus atribut 'System' & 'Hidden' dari cacert.pem agar bisa ditimpa.
+            //    Injector C++ Anda membuat file ini menjadi hidden/system, yang menyebabkan error 'Access Denied'.
+            string certPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cacert.pem");
+            if (File.Exists(certPath))
+            {
+                try
+                {
+                    // Reset atribut ke Normal agar bisa ditimpa
+                    File.SetAttributes(certPath, FileAttributes.Normal);
+                }
+                catch
+                {
+                    // Abaikan jika gagal (misal file sedang digunakan, meski sudah di-kill)
+                }
+            }
+
+            await Task.Delay(500);
+
             // --- KEAMANAN S3: Ambil Key dari Guardian ---
             byte[] sKey = KeyGuardian.GetMainKey();
             byte[] sIv = KeyGuardian.GetIV();
@@ -403,15 +438,11 @@ namespace HWID___Joshhh
                 string dClient = EncryptionHelper.DecryptString(ClientKey, sKey, sIv) ?? ClientKey;
                 string dSecret = EncryptionHelper.DecryptString(SecretKey, sKey, sIv) ?? SecretKey;
 
-                // CLEAN: Sembunyikan path di variabel saja, jangan print ke console
                 var s3 = new S3Helper(dClient, dSecret, "https://s3.nevaobjects.id/");
                 string bucketName = "jce-tools-bucket";
                 string objectName = $"{NamaUser}.zip";
 
                 SetProgress(0, "Mempersiapkan download...");
-
-                // PENTING: Pastikan S3Helper.cs Anda tidak memiliki baris "Console.WriteLine" atau "File.AppendAllText"
-                // yang mencatat request ini. Kode di sini hanya memanggil fungsinya.
 
                 await s3.DownloadAndExtractZipAsync(
                     bucketName,
@@ -424,12 +455,8 @@ namespace HWID___Joshhh
             }
             catch (Exception)
             {
-                // CLEAN: Sembunyikan pesan error ASLI S3 (yang berisi nama bucket/key) dari user
-                // Cukup beri tahu gagal.
+                // CLEAN: Sembunyikan pesan error ASLI S3 dari user
                 SetError("Gagal mengunduh file aset.\nPeriksa koneksi internet atau hubungi Admin.");
-
-                // Jika ingin debugging sendiri sebagai developer, uncomment baris bawah (JANGAN UNTUK USER)
-                // Debug.WriteLine(ex.ToString());
             }
         }
 
@@ -499,7 +526,6 @@ namespace HWID___Joshhh
             }
             catch
             {
-                // CLEAN: Pesan umum
                 SetError("Gagal memproses file update.");
             }
         }
@@ -507,7 +533,6 @@ namespace HWID___Joshhh
         private void OpenWhatsapp()
         {
             uint hwid = HWIDHelper.GetVolumeSerialNumberFromCurrentDrive();
-            // Ganti pesan teks URL encoded biar rapi
             string link = $"https://wa.me/6287775216846?text=Halo%20Admin%2C%20saya%20ingin%20daftar.%20HWID%3A%20{hwid}";
             try { Process.Start(new ProcessStartInfo { FileName = link, UseShellExecute = true }); } catch { }
         }
@@ -537,8 +562,7 @@ namespace HWID___Joshhh
         }
     }
 
-    // --- CLASS PENDUKUNG TETAP SAMA, HANYA PASTIKAN TOASTHELPER BERSIH ---
-    // (Kode KeyGuardian, ToastHelper, AutoUpdater disalin ulang di bawah agar lengkap)
+    // --- CLASS PENDUKUNG ---
 
     public static class KeyGuardian
     {
