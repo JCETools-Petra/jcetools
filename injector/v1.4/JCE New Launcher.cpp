@@ -1,3 +1,4 @@
+#define NOMINMAX // [FIX] Mencegah konflik macro min/max Windows dengan std::numeric_limits
 #pragma warning(disable:4996)
 #include <winsock2.h>
 #include <windows.h>
@@ -27,6 +28,7 @@
 #include <mutex>
 #include <errhandlingapi.h>
 #include <algorithm>
+#include <limits> 
 
 #pragma comment(lib, "shlwapi.lib")
 #pragma comment(lib, "wininet.lib")
@@ -50,39 +52,22 @@ AuthMode g_authMode = AUTH_NONE;
 std::string g_sessionToken = "";
 std::string g_challengeCode = "";
 std::atomic<bool> g_isRunning(true);
+std::atomic<bool> g_gameProcessLaunched(false);
 
 enum ConsoleColor {
     COLOR_DEFAULT = 7,
-    COLOR_SUCCESS = 10,
-    COLOR_ERROR = 12,
-    COLOR_INFO = 11,
-    COLOR_WARN = 14
+    COLOR_SUCCESS = 10,  // Hijau
+    COLOR_ERROR = 12,    // Merah
+    COLOR_INFO = 11,     // Cyan
+    COLOR_WARN = 14,     // Kuning
+    COLOR_DEBUG = 13     // Ungu (Untuk Debugging)
 };
 
-void SetColor(int color) {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
-}
-
-void DrawBanner() {
-    SetColor(COLOR_INFO);
-    std::wcout << L"\n";
-    std::wcout << L"    ==============================================\n";
-    std::wcout << L"               JCE TOOLS LAUNCHER v1.7            \n";
-    std::wcout << L"         Secure Access & Validation System        \n";
-    std::wcout << L"    ==============================================\n\n";
-    SetColor(COLOR_DEFAULT);
-}
-
+// Forward declarations (implementations after GeneralLogger)
+void SetColor(int color);
+void LogDebug(const std::wstring& msg);
+void DrawBanner();
 void PrintStatus(const std::wstring& stepName, const std::wstring& status, int color);
-
-void PrintStatus(const std::wstring& stepName, const std::wstring& status, int color) {
-    SetColor(COLOR_DEFAULT);
-    std::wcout << L"  ["; SetColor(COLOR_INFO); std::wcout << L"*"; SetColor(COLOR_DEFAULT);
-    std::wcout << L"] " << std::left << std::setw(35) << stepName << L" : ";
-    SetColor(color); std::wcout << status << std::endl;
-    SetColor(COLOR_DEFAULT);
-    Sleep(300);
-}
 
 // =================================================================================
 // String Obfuscation
@@ -125,10 +110,12 @@ struct Config {
 
     static constexpr long CONNECT_TIMEOUT = 30L;
     static constexpr long REQUEST_TIMEOUT = 45L;
+    static constexpr long BACKGROUND_CHECK_TIMEOUT = 60L;
     static constexpr int MAX_RETRY_ATTEMPTS = 3;
     static constexpr int RETRY_DELAY_MS = 2000;
     static constexpr int BACKGROUND_CHECK_MINUTES = 5;
-    static constexpr int MAX_FAILED_CHECKS = 3;
+    static constexpr int MAX_FAILED_CHECKS = 5;
+    static constexpr int BACKGROUND_RETRY_ATTEMPTS = 3;
 };
 
 const std::string Config::CURRENT_VERSION = "1.5";
@@ -175,45 +162,9 @@ void ShowFriendlyError(const std::wstring& detailedMessage, int errorCode, bool 
 void TerminateProcessByName(const std::wstring& processName);
 std::string base64UrlDecode(const std::string& input);
 void hexToBytes(const std::string& hex, unsigned char* bytes, size_t maxLen);
-std::wstring string_to_wstring(const std::string& str);
-
-// [FIX] New Helper: Get Absolute Path to Certificate
-std::string GetCertPath() {
-    wchar_t buffer[MAX_PATH];
-    GetModuleFileNameW(NULL, buffer, MAX_PATH);
-    PathRemoveFileSpecW(buffer); // Hapus nama exe, sisa folder
-    std::wstring certPath = std::wstring(buffer) + L"\\cacert.pem";
-
-    // Konversi wstring ke string (UTF-8) untuk CURL
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, certPath.c_str(), -1, NULL, 0, NULL, NULL);
-    std::string strTo(size_needed, 0);
-    WideCharToMultiByte(CP_UTF8, 0, certPath.c_str(), -1, &strTo[0], size_needed, NULL, NULL);
-    // Hapus null terminator
-    if (!strTo.empty()) strTo.pop_back();
-
-    return strTo;
-}
-
-class GeneralLogger {
-public:
-    GeneralLogger() {
-        wchar_t path[MAX_PATH]; GetModuleFileNameW(nullptr, path, MAX_PATH);
-        std::wstring p(path); log_path_ = p.substr(0, p.find_last_of(L"\\/")) + L"\\launcher_activity_log.txt";
-        std::wofstream f(log_path_, std::ios::trunc);
-        f << L"=== Session Start ===\n";
-    }
-    void log(const std::wstring& message) {
-        std::lock_guard<std::mutex> lk(mu_);
-        std::wofstream f(log_path_, std::ios::app);
-        if (f.is_open()) f << message << L"\n";
-    }
-private:
-    std::wstring log_path_; std::mutex mu_;
-};
-GeneralLogger g_generalLogger;
 
 // =================================================================================
-// CRYPTO & STRING UTILS
+// STRING CONVERSION (NEEDED BY LOGGER)
 // =================================================================================
 std::wstring string_to_wstring(const std::string& str) {
     if (str.empty()) return std::wstring();
@@ -223,6 +174,139 @@ std::wstring string_to_wstring(const std::string& str) {
     return wstrTo;
 }
 
+std::string GetCertPath() {
+    wchar_t buffer[MAX_PATH];
+    GetModuleFileNameW(NULL, buffer, MAX_PATH);
+    PathRemoveFileSpecW(buffer);
+    std::wstring certPath = std::wstring(buffer) + L"\\cacert.pem";
+
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, certPath.c_str(), -1, NULL, 0, NULL, NULL);
+    std::string strTo(size_needed, 0);
+    WideCharToMultiByte(CP_UTF8, 0, certPath.c_str(), -1, &strTo[0], size_needed, NULL, NULL);
+    if (!strTo.empty()) strTo.pop_back();
+
+    return strTo;
+}
+
+// =================================================================================
+// LOGGER CLASS
+// =================================================================================
+class GeneralLogger {
+public:
+    GeneralLogger() {
+        wchar_t path[MAX_PATH];
+        GetModuleFileNameW(nullptr, path, MAX_PATH);
+        std::wstring p(path);
+        log_path_ = p.substr(0, p.find_last_of(L"\\/")) + L"\\log.jce";
+
+        // Clear previous log and write header
+        std::wofstream f(log_path_, std::ios::trunc);
+        if (f.is_open()) {
+            f << L"=================================================================\n";
+            f << L"    JCE LAUNCHER - DEBUG LOG\n";
+            f << L"    Session Start: ";
+
+            // Add timestamp
+            auto now = std::time(nullptr);
+            std::tm tm;
+            localtime_s(&tm, &now);
+            wchar_t timeStr[100];
+            wcsftime(timeStr, 100, L"%Y-%m-%d %H:%M:%S", &tm);
+            f << timeStr << L"\n";
+            f << L"=================================================================\n\n";
+
+            // Log that constructor completed
+            f << L"[INIT] GeneralLogger constructor completed\n";
+            f << L"[INIT] Log file path: " << log_path_ << L"\n";
+            f << L"[INIT] Waiting for main() to be called...\n";
+            f << L"\n";
+            f.flush(); // Immediate flush
+        }
+    }
+
+    void log(const std::wstring& message) {
+        std::lock_guard<std::mutex> lk(mu_);
+        std::wofstream f(log_path_, std::ios::app);
+        if (f.is_open()) {
+            // Add timestamp to each log entry
+            auto now = std::time(nullptr);
+            std::tm tm;
+            localtime_s(&tm, &now);
+            wchar_t timeStr[20];
+            wcsftime(timeStr, 20, L"[%H:%M:%S] ", &tm);
+
+            f << timeStr << message << L"\n";
+            f.flush(); // CRITICAL: Flush immediately to ensure log is written even if crash
+        }
+    }
+
+    void separator() {
+        log(L"-----------------------------------------------------------------");
+    }
+
+private:
+    std::wstring log_path_;
+    std::mutex mu_;
+};
+GeneralLogger g_generalLogger;
+
+// =================================================================================
+// UI HELPER FUNCTIONS
+// =================================================================================
+void SetColor(int color) {
+    try {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+    } catch (...) {
+        g_generalLogger.log(L"ERROR: SetColor() failed");
+    }
+}
+
+void LogDebug(const std::wstring& msg) {
+    g_generalLogger.log(L"[DEBUG] " + msg);
+    try {
+        SetColor(COLOR_DEBUG);
+        std::wcout << L"  [DEBUG] " << msg << L"\n";
+        SetColor(COLOR_DEFAULT);
+    } catch (...) {
+        g_generalLogger.log(L"ERROR: LogDebug() console output failed");
+    }
+}
+
+void DrawBanner() {
+    g_generalLogger.log(L"DrawBanner() - START");
+    try {
+        SetColor(COLOR_INFO);
+        std::wcout << L"\n";
+        std::wcout << L"    ==============================================\n";
+        std::wcout << L"            JCE TOOLS LAUNCHER v1.7 (DEBUG)       \n";
+        std::wcout << L"         Secure Access & Validation System         \n";
+        std::wcout << L"    ==============================================\n\n";
+        SetColor(COLOR_DEFAULT);
+        g_generalLogger.log(L"DrawBanner() - SUCCESS");
+    } catch (const std::exception& e) {
+        g_generalLogger.log(L"ERROR: DrawBanner() exception: " + string_to_wstring(std::string(e.what())));
+    } catch (...) {
+        g_generalLogger.log(L"ERROR: DrawBanner() unknown exception");
+    }
+}
+
+void PrintStatus(const std::wstring& stepName, const std::wstring& status, int color) {
+    g_generalLogger.log(L"PrintStatus: " + stepName + L" = " + status);
+    try {
+        SetColor(COLOR_DEFAULT);
+        std::wcout << L"  ["; SetColor(COLOR_INFO); std::wcout << L"*"; SetColor(COLOR_DEFAULT);
+        std::wcout << L"] " << std::left << std::setw(35) << stepName << L" : ";
+        SetColor(color); std::wcout << status << std::endl;
+        SetColor(COLOR_DEFAULT);
+        Sleep(100);
+    } catch (...) {
+        g_generalLogger.log(L"ERROR: PrintStatus() console output failed");
+    }
+}
+
+// =================================================================================
+// CRYPTO & STRING UTILS
+// =================================================================================
 std::string base64UrlDecode(const std::string& input) {
     std::string base64 = input;
     for (char& c : base64) {
@@ -344,7 +428,6 @@ void SetupCurl(CURL* curl, const std::string& url, const std::string& postData, 
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, Config::REQUEST_TIMEOUT);
 
-    // [FIX PATH] Gunakan Path Absolut agar cacert selalu ketemu
     static std::string certPath = GetCertPath();
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
@@ -352,15 +435,34 @@ void SetupCurl(CURL* curl, const std::string& url, const std::string& postData, 
 }
 
 bool IsInternetAvailable() {
-    CURL* curl = curl_easy_init();
-    if (!curl) return false;
-    std::string response;
-    SetupCurl(curl, "https://www.google.com", "", &response);
-    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
-    CURLcode res = curl_easy_perform(curl);
-    curl_easy_cleanup(curl);
-    return res == CURLE_OK;
+    g_generalLogger.log(L"IsInternetAvailable() - Checking internet connection...");
+    try {
+        CURL* curl = curl_easy_init();
+        if (!curl) {
+            g_generalLogger.log(L"IsInternetAvailable() - FAILED: curl_easy_init() returned NULL");
+            return false;
+        }
+        std::string response;
+        SetupCurl(curl, "https://www.google.com", "", &response);
+        curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
+        CURLcode res = curl_easy_perform(curl);
+        curl_easy_cleanup(curl);
+
+        if (res == CURLE_OK) {
+            g_generalLogger.log(L"IsInternetAvailable() - SUCCESS");
+            return true;
+        } else {
+            g_generalLogger.log(L"IsInternetAvailable() - FAILED: curl error code " + std::to_wstring(res));
+            return false;
+        }
+    } catch (const std::exception& e) {
+        g_generalLogger.log(L"IsInternetAvailable() - EXCEPTION: " + string_to_wstring(std::string(e.what())));
+        return false;
+    } catch (...) {
+        g_generalLogger.log(L"IsInternetAvailable() - UNKNOWN EXCEPTION");
+        return false;
+    }
 }
 
 size_t WriteToFileCallback(void* ptr, size_t size, size_t nmemb, FILE* stream) {
@@ -380,7 +482,6 @@ bool DownloadToFile(const std::string& url, const std::wstring& filepath) {
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 300L);
 
-    // [FIX PATH]
     static std::string certPath = GetCertPath();
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
@@ -404,14 +505,30 @@ std::string DownloadToString(const std::string& url) {
 }
 
 void CheckForUpdates() {
-    PrintStatus(L"Memeriksa Pembaruan", L"Checking...", COLOR_WARN);
-    std::string latestVersion = DownloadToString(Config::VERSION_URL);
-    if (!latestVersion.empty()) {
-        latestVersion.erase(latestVersion.find_last_not_of(" \n\r\t") + 1);
-    }
+    g_generalLogger.log(L"CheckForUpdates() - START");
+    try {
+        PrintStatus(L"Memeriksa Pembaruan", L"Checking...", COLOR_WARN);
+        g_generalLogger.log(L"CheckForUpdates() - Downloading version info from: " + string_to_wstring(Config::VERSION_URL));
 
-    if (latestVersion.empty() || latestVersion == Config::CURRENT_VERSION) {
-        PrintStatus(L"Versi Launcher", L"Terbaru (v" + string_to_wstring(Config::CURRENT_VERSION) + L")", COLOR_SUCCESS);
+        std::string latestVersion = DownloadToString(Config::VERSION_URL);
+        g_generalLogger.log(L"CheckForUpdates() - Downloaded version: " + string_to_wstring(latestVersion));
+
+        if (!latestVersion.empty()) {
+            latestVersion.erase(latestVersion.find_last_not_of(" \n\r\t") + 1);
+        }
+
+        if (latestVersion.empty() || latestVersion == Config::CURRENT_VERSION) {
+            g_generalLogger.log(L"CheckForUpdates() - Version is up to date: " + string_to_wstring(Config::CURRENT_VERSION));
+            PrintStatus(L"Versi Launcher", L"Terbaru (v" + string_to_wstring(Config::CURRENT_VERSION) + L")", COLOR_SUCCESS);
+            return;
+        }
+
+        g_generalLogger.log(L"CheckForUpdates() - Update available: " + string_to_wstring(latestVersion));
+    } catch (const std::exception& e) {
+        g_generalLogger.log(L"CheckForUpdates() - EXCEPTION: " + string_to_wstring(std::string(e.what())));
+        return;
+    } catch (...) {
+        g_generalLogger.log(L"CheckForUpdates() - UNKNOWN EXCEPTION");
         return;
     }
 
@@ -516,7 +633,6 @@ std::string SendHWIDRequest(const std::string& encryptedHwid, const std::string&
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, Config::REQUEST_TIMEOUT);
 
-    // [FIX PATH]
     static std::string certPath = GetCertPath();
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
@@ -544,8 +660,12 @@ void ShowFriendlyError(const std::wstring& detailedMessage, int errorCode, bool 
     SetColor(COLOR_ERROR);
     std::wcout << L"\n  [!] ERROR (" << errorCode << L"): " << detailedMessage << L"\n";
     SetColor(COLOR_DEFAULT);
-    MessageBoxW(NULL, (detailedMessage + L"\n\nCode: " + std::to_wstring(errorCode)).c_str(), L"JCE Error", MB_OK | MB_ICONERROR);
-    if (terminate) { Sleep(1000); exit(1); }
+    // [DEBUG] Changed exit to pause so we can see the error
+    if (terminate) {
+        std::wcout << L"\n  [DEBUG] Fatal Error. Press Enter to exit...\n";
+        system("pause");
+        exit(1);
+    }
 }
 
 DWORD GetVolumeSerialNumberFromCurrentDrive() {
@@ -598,10 +718,16 @@ int VerifyLicenseHWID(bool isInitialCheck) {
     if (isInitialCheck) PrintStatus(L"Mode Otomatis (HWID)", L"Checking...", COLOR_WARN);
 
     std::string sessionToken = RequestSessionKeyHWID();
-    if (sessionToken.empty()) return 2;
+    if (sessionToken.empty()) {
+        if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Koneksi ke server gagal, mencoba ulang...");
+        return 2;
+    }
 
     SessionKeyData sessionData = ParseJWTToken(sessionToken);
-    if (!sessionData.valid) return 2;
+    if (!sessionData.valid) {
+        if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Respon server tidak valid");
+        return 2;
+    }
 
     DWORD hwid_val = GetVolumeSerialNumberFromCurrentDrive();
     std::string plaintext = ConvertToString(hwid_val);
@@ -614,7 +740,10 @@ int VerifyLicenseHWID(bool isInitialCheck) {
     std::string encryptedString = ciphertextToHex(ciphertext);
 
     std::string response = SendHWIDRequest(encryptedString, sessionToken);
-    if (response.empty()) return 2;
+    if (response.empty()) {
+        if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Server tidak merespon, mencoba ulang...");
+        return 2;
+    }
 
     try {
         auto jsonResponse = nlohmann::json::parse(response);
@@ -629,6 +758,9 @@ int VerifyLicenseHWID(bool isInitialCheck) {
                 std::wcout << L"  [+] Login sebagai    : " << string_to_wstring(user) << L"\n";
                 std::wcout << L"  [+] Metode Akses     : HWID (Automatic)\n";
                 SetColor(COLOR_DEFAULT);
+            } else {
+                // Background check success
+                g_generalLogger.log(L"Pemeriksaan lisensi berhasil");
             }
             return 1; // Success
         }
@@ -637,29 +769,46 @@ int VerifyLicenseHWID(bool isInitialCheck) {
             if (msg.find("not found") != std::string::npos || jsonResponse.value("code", "") == "NOT_FOUND") {
                 return 0; // Trigger Login Manual
             }
+            if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Verifikasi ditolak oleh server");
             if (isInitialCheck) ShowFriendlyError(string_to_wstring(msg), 302, true);
             return 2;
         }
     }
-    catch (...) { return 2; }
+    catch (...) {
+        if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Terjadi kesalahan, mencoba ulang...");
+        return 2;
+    }
 }
 
 // =================================================================================
 // CORE LOGIC 2: VERIFY SESSION
 // =================================================================================
 bool VerifyLicenseSession(bool isInitialCheck) {
-    if (g_sessionToken.empty()) return false;
+    if (g_sessionToken.empty()) {
+        if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Sesi tidak ditemukan");
+        return false;
+    }
     std::string response_to_challenge = g_challengeCode;
     std::reverse(response_to_challenge.begin(), response_to_challenge.end());
 
     std::string response = SendTokenCheckRequest(g_sessionToken, response_to_challenge);
-    if (response.empty()) return false;
+    if (response.empty()) {
+        if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Koneksi ke server gagal, mencoba ulang...");
+        return false;
+    }
 
     try {
         auto json = nlohmann::json::parse(response);
-        if (json.value("status", "error") == "success") return true;
-        else {
+        if (json.value("status", "error") == "success") {
             if (!isInitialCheck) {
+                g_generalLogger.log(L"Pemeriksaan lisensi berhasil");
+            }
+            return true;
+        }
+        else {
+            std::string msg = json.value("message", "Session expired");
+            if (!isInitialCheck) {
+                g_generalLogger.log(L"Pemeriksaan: Sesi login telah berakhir");
                 g_isRunning = false;
                 TerminateProcessByName(Config::TARGET_PROCESS);
                 ShowFriendlyError(L"Sesi ID/Password telah berakhir.", 305, false);
@@ -667,7 +816,10 @@ bool VerifyLicenseSession(bool isInitialCheck) {
             return false;
         }
     }
-    catch (...) { return false; }
+    catch (...) {
+        if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Terjadi kesalahan, mencoba ulang...");
+        return false;
+    }
 }
 
 // =================================================================================
@@ -681,14 +833,26 @@ void PerformLoginUI() {
     std::string username, password;
     SetColor(COLOR_INFO); std::cout << "  Username: "; SetColor(COLOR_DEFAULT); std::cin >> username;
     SetColor(COLOR_INFO); std::cout << "  Password: "; SetColor(COLOR_DEFAULT);
+
     HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); DWORD mode = 0;
     GetConsoleMode(hStdin, &mode); SetConsoleMode(hStdin, mode & (~ENABLE_ECHO_INPUT));
-    std::cin >> password; SetConsoleMode(hStdin, mode); std::cout << "\n\n";
+
+    std::cin >> password;
+
+    SetConsoleMode(hStdin, mode);
+    std::cout << "\n\n";
+
+    // === PERBAIKAN UTAMA DISINI ===
+    // [FIX] Menggunakan (std::numeric_limits...) untuk menghindari konflik macro max
+    std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+    LogDebug(L"Input buffer cleared.");
 
     PrintStatus(L"Otentikasi Akun", L"Verifying...", COLOR_WARN);
     std::string response = SendLoginRequest(username, password);
 
     if (response.empty()) { ShowFriendlyError(L"Gagal terhubung ke server login.", 201, true); return; }
+
+    LogDebug(L"Server Response Received.");
 
     try {
         auto json = nlohmann::json::parse(response);
@@ -702,6 +866,7 @@ void PerformLoginUI() {
             std::wcout << L"\n"; SetColor(COLOR_INFO);
             std::wcout << L"  [+] Login sebagai    : " << string_to_wstring(username) << L"\n";
             std::wcout << L"  [+] Metode Akses     : ID & Password\n"; SetColor(COLOR_DEFAULT);
+            LogDebug(L"Auth successful, continuing to launch...");
         }
         else {
             std::string msg = json.value("message", "Invalid credentials");
@@ -712,14 +877,49 @@ void PerformLoginUI() {
 }
 
 void InitialCheck() {
-    PrintStatus(L"Cek Koneksi Internet", L"Checking...", COLOR_WARN);
-    if (!IsInternetAvailable()) { ShowFriendlyError(L"Tidak ada koneksi internet.", 200, true); return; }
-    PrintStatus(L"Cek Koneksi Internet", L"Online [OK]", COLOR_SUCCESS);
+    g_generalLogger.log(L"InitialCheck() - START");
+    g_generalLogger.separator();
 
-    int hwidResult = VerifyLicenseHWID(true);
-    if (hwidResult == 1) { g_authMode = AUTH_HWID; }
-    else if (hwidResult == 0) { PerformLoginUI(); }
-    else { ShowFriendlyError(L"Gagal memverifikasi HWID (Connection Error).", 205, true); }
+    try {
+        g_generalLogger.log(L"InitialCheck() - Checking internet connection...");
+        PrintStatus(L"Cek Koneksi Internet", L"Checking...", COLOR_WARN);
+
+        if (!IsInternetAvailable()) {
+            g_generalLogger.log(L"InitialCheck() - FAILED: No internet connection");
+            ShowFriendlyError(L"Tidak ada koneksi internet.", 200, true);
+            return;
+        }
+        PrintStatus(L"Cek Koneksi Internet", L"Online [OK]", COLOR_SUCCESS);
+        g_generalLogger.log(L"InitialCheck() - Internet connection OK");
+
+        g_generalLogger.log(L"InitialCheck() - Verifying HWID license...");
+        int hwidResult = VerifyLicenseHWID(true);
+        g_generalLogger.log(L"InitialCheck() - HWID verification result: " + std::to_wstring(hwidResult));
+
+        if (hwidResult == 1) {
+            g_authMode = AUTH_HWID;
+            g_generalLogger.log(L"InitialCheck() - Auth Mode set to HWID");
+            LogDebug(L"Auth Mode set to HWID");
+        }
+        else if (hwidResult == 0) {
+            g_generalLogger.log(L"InitialCheck() - HWID not registered, entering manual login");
+            LogDebug(L"HWID failed, entering PerformLoginUI");
+            PerformLoginUI();
+        }
+        else {
+            g_generalLogger.log(L"InitialCheck() - HWID verification failed with error");
+            ShowFriendlyError(L"Gagal memverifikasi HWID (Connection Error).", 205, true);
+        }
+
+        g_generalLogger.log(L"InitialCheck() - END");
+        g_generalLogger.separator();
+    } catch (const std::exception& e) {
+        g_generalLogger.log(L"InitialCheck() - EXCEPTION: " + string_to_wstring(std::string(e.what())));
+        throw;
+    } catch (...) {
+        g_generalLogger.log(L"InitialCheck() - UNKNOWN EXCEPTION");
+        throw;
+    }
 }
 
 void TerminateProcessByName(const std::wstring& processName) {
@@ -737,37 +937,139 @@ void TerminateProcessByName(const std::wstring& processName) {
     CloseHandle(hSnap);
 }
 
+// =================================================================================
+// CLEANUP & EXIT HANDLERS
+// =================================================================================
+void CleanupAndExit() {
+    static bool alreadyCalled = false;
+    if (alreadyCalled) return; // Prevent multiple calls
+    alreadyCalled = true;
+
+    g_isRunning = false;
+
+    // Only terminate game if it was actually launched
+    if (g_gameProcessLaunched) {
+        g_generalLogger.log(L"Menutup program dan game...");
+        TerminateProcessByName(Config::TARGET_PROCESS);
+        Sleep(500);
+        g_generalLogger.log(L"Cleanup selesai");
+    } else {
+        g_generalLogger.log(L"Program ditutup (game belum dijalankan)");
+    }
+}
+
+BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
+    switch (dwCtrlType) {
+        case CTRL_C_EVENT:          // Ctrl+C
+            g_generalLogger.log(L"Pengguna menekan Ctrl+C");
+            break;
+        case CTRL_BREAK_EVENT:      // Ctrl+Break
+            g_generalLogger.log(L"Pengguna menekan Ctrl+Break");
+            break;
+        case CTRL_CLOSE_EVENT:      // Console window closed
+            g_generalLogger.log(L"Jendela program ditutup");
+            break;
+        case CTRL_LOGOFF_EVENT:     // User logoff
+            g_generalLogger.log(L"Pengguna logout dari Windows");
+            break;
+        case CTRL_SHUTDOWN_EVENT:   // System shutdown
+            g_generalLogger.log(L"Sistem sedang shutdown");
+            break;
+        default:
+            return FALSE;
+    }
+    CleanupAndExit();
+    return TRUE;
+}
+
+// =================================================================================
+// BACKGROUND CHECK WITH RETRY MECHANISM
+// =================================================================================
+bool VerifyWithRetry(AuthMode mode, int maxRetries) {
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+        bool isValid = false;
+
+        // Perform verification based on auth mode
+        if (mode == AUTH_HWID) {
+            int res = VerifyLicenseHWID(false);
+            isValid = (res == 1);
+        }
+        else if (mode == AUTH_USERPASS) {
+            isValid = VerifyLicenseSession(false);
+        }
+
+        // If valid, return success immediately
+        if (isValid) {
+            if (attempt > 1) {
+                g_generalLogger.log(L"Koneksi pulih, verifikasi berhasil");
+            }
+            return true;
+        }
+
+        // If failed and not the last attempt, wait before retry with exponential backoff
+        if (attempt < maxRetries) {
+            int delaySec = (Config::RETRY_DELAY_MS * attempt) / 1000; // Convert to seconds
+            g_generalLogger.log(L"Menunggu " + std::to_wstring(delaySec) + L" detik sebelum mencoba lagi...");
+            Sleep(Config::RETRY_DELAY_MS * attempt);
+        }
+    }
+
+    // All retries failed
+    g_generalLogger.log(L"Pemeriksaan gagal setelah beberapa percobaan");
+    return false;
+}
+
 void BackgroundThread() {
     int fails = 0;
     while (g_isRunning) {
         std::this_thread::sleep_for(std::chrono::minutes(Config::BACKGROUND_CHECK_MINUTES));
         if (!g_isRunning) break;
-        bool isValid = false;
-        if (g_authMode == AUTH_HWID) { int res = VerifyLicenseHWID(false); isValid = (res == 1); }
-        else if (g_authMode == AUTH_USERPASS) { isValid = VerifyLicenseSession(false); }
+
+        // Log background check start with timestamp
+        auto now = std::time(nullptr);
+        std::tm tm;
+        localtime_s(&tm, &now);
+        wchar_t timeStr[100];
+        wcsftime(timeStr, 100, L"%H:%M:%S", &tm);
+        g_generalLogger.log(L"--- Pemeriksaan otomatis [" + std::wstring(timeStr) + L"] ---");
+
+        // Use retry mechanism for background check
+        bool isValid = VerifyWithRetry(g_authMode, Config::BACKGROUND_RETRY_ATTEMPTS);
 
         if (!isValid) {
             fails++;
+            g_generalLogger.log(L"Status: Gagal (percobaan ke-" + std::to_wstring(fails) + L" dari maksimal " + std::to_wstring(Config::MAX_FAILED_CHECKS) + L")");
+
             if (fails >= Config::MAX_FAILED_CHECKS) {
-                g_isRunning = false; TerminateProcessByName(Config::TARGET_PROCESS);
-                ShowFriendlyError(L"Sesi validasi berakhir. Koneksi terputus.", 305, false);
+                g_generalLogger.log(L"Koneksi terputus karena terlalu banyak kegagalan verifikasi");
+                g_isRunning = false;
+                TerminateProcessByName(Config::TARGET_PROCESS);
+                ShowFriendlyError(L"Sesi validasi berakhir setelah " + std::to_wstring(Config::MAX_FAILED_CHECKS) + L" kali gagal.", 305, false);
             }
         }
-        else { fails = 0; }
+        else {
+            if (fails > 0) {
+                g_generalLogger.log(L"Status: Berhasil (koneksi kembali normal)");
+            } else {
+                g_generalLogger.log(L"Status: Berhasil");
+            }
+            fails = 0;
+        }
     }
+    g_generalLogger.log(L"Program dihentikan");
 }
 void HideConsole() {
     ShowWindow(GetConsoleWindow(), SW_HIDE);
 }
 
 bool InjectDLL(DWORD processID, const std::wstring& dllPath) {
+    LogDebug(L"Attempting Injection into PID: " + std::to_wstring(processID));
     HandleWrapper hProcess(OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID));
     if (!hProcess) {
         ShowFriendlyError(L"Injeksi DLL gagal: Tidak dapat membuka proses target.", 501, true);
         return false;
     }
 
-    // PERBAIKAN: Menghitung ukuran dengan benar
     SIZE_T dllPathSize = (dllPath.length() + 1) * sizeof(wchar_t);
     LPVOID pDllPathRemote = VirtualAllocEx(hProcess, NULL, dllPathSize, MEM_COMMIT, PAGE_READWRITE);
 
@@ -782,7 +1084,6 @@ bool InjectDLL(DWORD processID, const std::wstring& dllPath) {
         return false;
     }
 
-    // PERBAIKAN: GetModuleHandle dengan NULL check
     HMODULE hKernel32 = GetModuleHandleW(L"kernel32.dll");
     if (!hKernel32) {
         ShowFriendlyError(L"Injeksi DLL gagal: Tidak dapat memuat kernel32.dll.", 505, true);
@@ -819,15 +1120,39 @@ std::wstring GetExecutablePath(const std::wstring& executableName) {
 }
 
 void LaunchAndInject() {
-    std::wstring auditionExePath = GetExecutablePath(Config::TARGET_PROCESS);
-    if (!PathFileExistsW(auditionExePath.c_str())) {
-        ShowFriendlyError(L"Audition.exe tidak ditemukan. Harap letakkan launcher di folder game.", 401, true);
+    g_generalLogger.log(L"LaunchAndInject() - START");
+    g_generalLogger.separator();
+
+    std::wstring auditionExePath; // Declare outside try block
+
+    try {
+        PrintStatus(L"Debug Info", L"Mengecek File Game...", COLOR_INFO);
+
+        auditionExePath = GetExecutablePath(Config::TARGET_PROCESS);
+        g_generalLogger.log(L"LaunchAndInject() - Game path: " + auditionExePath);
+        // [DEBUG] PRINT PATH
+        LogDebug(L"Path Game yang dicari: " + auditionExePath);
+
+        if (!PathFileExistsW(auditionExePath.c_str())) {
+            g_generalLogger.log(L"LaunchAndInject() - FAILED: Game executable not found");
+            ShowFriendlyError(L"Audition.exe tidak ditemukan.\nPath: " + auditionExePath, 401, true);
+            return;
+        }
+        g_generalLogger.log(L"LaunchAndInject() - Game executable found");
+    } catch (const std::exception& e) {
+        g_generalLogger.log(L"LaunchAndInject() - EXCEPTION in file check: " + string_to_wstring(std::string(e.what())));
+        throw;
+    } catch (...) {
+        g_generalLogger.log(L"LaunchAndInject() - UNKNOWN EXCEPTION in file check");
+        throw;
     }
 
+    g_generalLogger.log(L"LaunchAndInject() - Cleaning old processes...");
+    PrintStatus(L"Debug Info", L"Membersihkan Proses Lama...", COLOR_INFO);
     TerminateProcessByName(Config::TARGET_PROCESS);
     Sleep(1000);
 
-    // PERBAIKAN: Initialize PROCESS_INFORMATION dengan ZeroMemory
+    g_generalLogger.log(L"LaunchAndInject() - Preparing process creation...");
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
     ZeroMemory(&si, sizeof(si));
@@ -836,21 +1161,39 @@ void LaunchAndInject() {
 
     wchar_t fullCommand[1024];
     swprintf_s(fullCommand, _countof(fullCommand), L"\"%s\" %s", auditionExePath.c_str(), Config::LAUNCH_ARGS.c_str());
+    g_generalLogger.log(L"LaunchAndInject() - Command: " + std::wstring(fullCommand));
+
+    PrintStatus(L"Debug Info", L"Memulai Game...", COLOR_INFO);
+    g_generalLogger.log(L"LaunchAndInject() - Calling CreateProcessW...");
 
     if (!CreateProcessW(NULL, fullCommand, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+        DWORD error = GetLastError();
+        g_generalLogger.log(L"LaunchAndInject() - FAILED: CreateProcessW error code " + std::to_wstring(error));
         ShowFriendlyError(L"Gagal memulai Audition.exe. Coba jalankan sebagai Administrator.", 402, true);
         return;
     }
+    g_generalLogger.log(L"LaunchAndInject() - CreateProcessW SUCCESS, PID: " + std::to_wstring(pi.dwProcessId));
 
+    PrintStatus(L"Debug Info", L"Menunggu Window Game...", COLOR_INFO);
+    g_generalLogger.log(L"LaunchAndInject() - Waiting for game window...");
     HWND hAuditionWindow = NULL;
-    for (int i = 0; i < 30; ++i) {
+
+    // [DEBUG] Counter
+    int waitCount = 0;
+    for (int i = 0; i < 120; ++i) {
         hAuditionWindow = FindWindowW(NULL, Config::TARGET_WINDOW_TITLE.c_str());
         if (hAuditionWindow != NULL) break;
         Sleep(500);
+        waitCount++;
+        if (waitCount % 10 == 0) {
+            LogDebug(L"Waiting for window... " + std::to_wstring(waitCount));
+            g_generalLogger.log(L"LaunchAndInject() - Still waiting for window... (attempt " + std::to_wstring(waitCount) + L")");
+        }
     }
 
     if (hAuditionWindow == NULL) {
-        ShowFriendlyError(L"Gagal menemukan jendela game. Game mungkin crash saat dimulai.", 403, true);
+        g_generalLogger.log(L"LaunchAndInject() - FAILED: Game window not found (timeout)");
+        ShowFriendlyError(L"Gagal menemukan jendela game (Timeout).", 403, true);
         if (pi.hProcess) {
             TerminateProcess(pi.hProcess, 1);
             CloseHandle(pi.hProcess);
@@ -858,9 +1201,14 @@ void LaunchAndInject() {
         if (pi.hThread) CloseHandle(pi.hThread);
         return;
     }
+    g_generalLogger.log(L"LaunchAndInject() - Game window found!");
 
     std::wstring fullDllPath = GetExecutablePath(Config::TARGET_DLL);
+    g_generalLogger.log(L"LaunchAndInject() - DLL path: " + fullDllPath);
+    LogDebug(L"Path DLL yang dicari: " + fullDllPath);
+
     if (!PathFileExistsW(fullDllPath.c_str())) {
+        g_generalLogger.log(L"LaunchAndInject() - FAILED: DLL file not found");
         ShowFriendlyError(L"File pendukung (DLL) tidak ditemukan.", 404, true);
         if (pi.hProcess) {
             TerminateProcess(pi.hProcess, 1);
@@ -869,12 +1217,22 @@ void LaunchAndInject() {
         if (pi.hThread) CloseHandle(pi.hThread);
         return;
     }
+    g_generalLogger.log(L"LaunchAndInject() - DLL file found");
+
+    PrintStatus(L"Debug Info", L"Menyuntikkan DLL...", COLOR_INFO);
+    g_generalLogger.log(L"LaunchAndInject() - Starting DLL injection...");
 
     if (InjectDLL(pi.dwProcessId, fullDllPath)) {
+        PrintStatus(L"Status Injeksi", L"Berhasil [OK]", COLOR_SUCCESS);
+        g_gameProcessLaunched = true; // Mark game as launched
+        g_generalLogger.log(L"LaunchAndInject() - DLL injection SUCCESS");
+        g_generalLogger.log(L"LaunchAndInject() - Game successfully launched and injected");
+        g_generalLogger.separator();
         Sleep(1500);
         HideConsole();
     }
     else {
+        g_generalLogger.log(L"LaunchAndInject() - FAILED: DLL injection failed");
         if (pi.hProcess) {
             TerminateProcess(pi.hProcess, 1);
             CloseHandle(pi.hProcess);
@@ -885,64 +1243,158 @@ void LaunchAndInject() {
 
     if (pi.hProcess) CloseHandle(pi.hProcess);
     if (pi.hThread) CloseHandle(pi.hThread);
+
+    g_generalLogger.log(L"LaunchAndInject() - END");
 }
 
 // =================================================================================
 // ENTRY POINT
 // =================================================================================
 int main() {
-    SetConsoleTitle(L"JCE Tools Launcher - Hybrid Auth");
-    DrawBanner();
+    // ULTRA-EARLY LOGGING - First thing in main()
+    g_generalLogger.log(L"");
+    g_generalLogger.log(L"!!! ENTERED main() FUNCTION !!!");
+    g_generalLogger.log(L"!!! THIS IS PROOF THAT main() WAS CALLED !!!");
+    g_generalLogger.separator();
 
-    // Pastikan cacert.pem ada di folder yang sama dengan EXE
-    std::wstring certW = string_to_wstring(GetCertPath());
-    if (GetFileAttributesW(certW.c_str()) == INVALID_FILE_ATTRIBUTES) {
-        // Warning, tapi jangan exit agar tidak membingungkan
-        // Launcher akan coba connect, jika gagal akan muncul error CURL Code 60
-        SetColor(COLOR_WARN);
-        std::wcout << L"  [!] Warning: cacert.pem tidak ditemukan. Koneksi mungkin gagal.\n";
-        std::wcout << L"  [!] Path: " << certW << L"\n";
-        SetColor(COLOR_DEFAULT);
-    }
-    else {
-        SetFileAttributesW(certW.c_str(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
-    }
+    // Show MessageBox as visual confirmation
+    MessageBoxW(NULL, L"main() has been called!\nCheck log.jce for details.", L"DEBUG: main() Called", MB_OK | MB_ICONINFORMATION);
 
-    CheckForUpdates();
-    InitialCheck();
+    try {
+        g_generalLogger.log(L"Calling SetConsoleTitle...");
+        SetConsoleTitle(L"JCE Tools Launcher - Hybrid Auth (DEBUG MODE)");
+        g_generalLogger.log(L"SetConsoleTitle OK");
 
-    LaunchAndInject();
+        g_generalLogger.log(L"=== Program Started ===");
+        g_generalLogger.log(L"Step 1: Drawing banner...");
+        DrawBanner();
 
-    Sleep(3000);
-    HideConsole(); 
+        g_generalLogger.log(L"Step 2: Registering cleanup handlers...");
+        // Register cleanup handlers
+        SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
+        std::atexit(CleanupAndExit);
+        g_generalLogger.log(L"Step 3: Cleanup handlers registered successfully");
 
-    std::thread bgThread(BackgroundThread);
-    while (g_isRunning) {
-        bool isGameRunning = false; // Penanda apakah game masih jalan
+        g_generalLogger.log(L"Step 4: Checking certificate...");
+        // Pastikan cacert.pem ada
+        std::wstring certW = string_to_wstring(GetCertPath());
+        g_generalLogger.log(L"Certificate path: " + certW);
 
-        HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-        if (hSnap != INVALID_HANDLE_VALUE) {
-            PROCESSENTRY32W pe; pe.dwSize = sizeof(pe);
-            if (Process32FirstW(hSnap, &pe)) {
-                do {
-                    // Cek apakah nama proses sama dengan Audition.exe
-                    if (wcscmp(pe.szExeFile, Config::TARGET_PROCESS.c_str()) == 0) {
-                        isGameRunning = true; // Game ditemukan!
-                        break;
-                    }
-                } while (Process32NextW(hSnap, &pe));
+        if (GetFileAttributesW(certW.c_str()) == INVALID_FILE_ATTRIBUTES) {
+            g_generalLogger.log(L"ERROR: cacert.pem NOT FOUND!");
+            SetColor(COLOR_ERROR);
+            std::wcout << L"\n  [!] ERROR: cacert.pem tidak ditemukan!\n";
+            std::wcout << L"  [!] Path: " << certW << L"\n\n";
+            std::wcout << L"  [!] Pastikan file berikut ada di folder yang sama dengan executable:\n";
+            std::wcout << L"      - cacert.pem\n";
+            std::wcout << L"      - libcurl.dll\n";
+            std::wcout << L"      - libcrypto-3.dll\n";
+            std::wcout << L"      - zlib1.dll\n\n";
+            std::wcout << L"  [!] Copy semua file dari folder Release!\n";
+            SetColor(COLOR_DEFAULT);
+
+            MessageBoxW(NULL,
+                L"ERROR: cacert.pem tidak ditemukan!\n\n"
+                L"Pastikan file berikut ada di folder yang sama dengan executable:\n"
+                L"- cacert.pem\n"
+                L"- libcurl.dll\n"
+                L"- libcrypto-3.dll\n"
+                L"- zlib1.dll\n\n"
+                L"Copy semua file dari folder Release!",
+                L"Missing Files Error",
+                MB_OK | MB_ICONERROR);
+
+            system("pause");
+            return 1;
+        }
+        else {
+            g_generalLogger.log(L"Certificate found OK");
+            SetFileAttributesW(certW.c_str(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
+        }
+
+        g_generalLogger.log(L"Step 5: Checking for updates...");
+        CheckForUpdates();
+
+        g_generalLogger.log(L"Step 6: Starting initial check...");
+        LogDebug(L"Entering InitialCheck...");
+        InitialCheck();
+        LogDebug(L"InitialCheck Returned.");
+
+        if (g_authMode == AUTH_NONE) {
+            LogDebug(L"Auth Mode is NONE. Something went wrong in logic flow.");
+            g_generalLogger.log(L"ERROR: Auth mode is NONE after InitialCheck");
+            system("pause");
+            return 1;
+        }
+
+        g_generalLogger.log(L"Step 7: Launching and injecting game...");
+        LogDebug(L"Calling LaunchAndInject...");
+        LaunchAndInject();
+        LogDebug(L"LaunchAndInject Returned.");
+
+        Sleep(3000);
+        // HideConsole(); // Disable hide for debug
+
+        g_generalLogger.log(L"Step 8: Starting background monitoring thread...");
+        std::thread bgThread(BackgroundThread);
+
+        g_generalLogger.log(L"Step 9: Entering main monitoring loop...");
+        while (g_isRunning) {
+            bool isGameRunning = false;
+
+            HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+            if (hSnap != INVALID_HANDLE_VALUE) {
+                PROCESSENTRY32W pe; pe.dwSize = sizeof(pe);
+                if (Process32FirstW(hSnap, &pe)) {
+                    do {
+                        if (wcscmp(pe.szExeFile, Config::TARGET_PROCESS.c_str()) == 0) {
+                            isGameRunning = true;
+                            break;
+                        }
+                    } while (Process32NextW(hSnap, &pe));
+                }
+                CloseHandle(hSnap);
             }
-            CloseHandle(hSnap);
+
+            if (!isGameRunning) {
+                LogDebug(L"Game process lost. Closing launcher...");
+                g_generalLogger.log(L"Game ditutup oleh pengguna");
+                g_isRunning = false;
+            }
+
+            Sleep(5000);
         }
 
-        // Jika game TIDAK ditemukan, matikan launcher
-        if (!isGameRunning) {
-            g_isRunning = false; // Ini akan menghentikan loop BackgroundThread juga
-        }
+        g_generalLogger.log(L"Step 10: Main loop exited, waiting for background thread...");
+        if (bgThread.joinable()) bgThread.join();
 
-        Sleep(5000); // Cek setiap 5 detik
+        g_generalLogger.log(L"Step 11: Performing final cleanup...");
+        // Cleanup before exit
+        CleanupAndExit();
+
+        g_generalLogger.log(L"Step 12: Program completed successfully");
+
+        // [DEBUG] Keep window open at end
+        std::cout << "\nProgram ended. Press Enter to exit.";
+        std::cin.ignore();
+        std::cin.get();
+
+        return 0;
     }
-
-    if (bgThread.joinable()) bgThread.join();
-    return 0;
+    catch (const std::exception& e) {
+        g_generalLogger.log(L"FATAL ERROR (exception): " + string_to_wstring(std::string(e.what())));
+        SetColor(COLOR_ERROR);
+        std::wcout << L"\n\n  [!] FATAL ERROR: " << string_to_wstring(std::string(e.what())) << L"\n";
+        SetColor(COLOR_DEFAULT);
+        system("pause");
+        return 1;
+    }
+    catch (...) {
+        g_generalLogger.log(L"FATAL ERROR: Unknown exception caught");
+        SetColor(COLOR_ERROR);
+        std::wcout << L"\n\n  [!] FATAL ERROR: Unknown exception\n";
+        SetColor(COLOR_DEFAULT);
+        system("pause");
+        return 1;
+    }
 }
