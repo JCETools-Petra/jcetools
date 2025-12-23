@@ -38,6 +38,30 @@
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "crypt32.lib")
 #pragma comment(lib, "normaliz.lib")
+#pragma comment(lib, "ntdll.lib")
+
+// =================================================================================
+// NT API DECLARATIONS FOR ANTI-DEBUG
+// =================================================================================
+typedef NTSTATUS(NTAPI* pNtQueryInformationProcess)(
+    HANDLE ProcessHandle,
+    DWORD ProcessInformationClass,
+    PVOID ProcessInformation,
+    DWORD ProcessInformationLength,
+    PDWORD ReturnLength
+);
+
+typedef NTSTATUS(NTAPI* pNtSetInformationThread)(
+    HANDLE ThreadHandle,
+    DWORD ThreadInformationClass,
+    PVOID ThreadInformation,
+    ULONG ThreadInformationLength
+);
+
+#define ProcessDebugPort 7
+#define ProcessDebugObjectHandle 30
+#define ProcessDebugFlags 31
+#define ThreadHideFromDebugger 17
 
 // =================================================================================
 // GLOBALS & ENUMS
@@ -53,6 +77,8 @@ std::string g_sessionToken = "";
 std::string g_challengeCode = "";
 std::atomic<bool> g_isRunning(true);
 std::atomic<bool> g_gameProcessLaunched(false);
+HANDLE g_hJobObject = NULL; // Job object untuk automatic child process termination
+HANDLE g_hGameProcess = NULL; // Game process handle untuk efficient monitoring
 
 enum ConsoleColor {
     COLOR_DEFAULT = 7,
@@ -162,6 +188,8 @@ void ShowFriendlyError(const std::wstring& detailedMessage, int errorCode, bool 
 void TerminateProcessByName(const std::wstring& processName);
 std::string base64UrlDecode(const std::string& input);
 void hexToBytes(const std::string& hex, unsigned char* bytes, size_t maxLen);
+bool IsDebuggerAttached();
+void HandleDebuggerDetection();
 
 // =================================================================================
 // STRING CONVERSION (NEEDED BY LOGGER)
@@ -251,6 +279,372 @@ private:
 GeneralLogger g_generalLogger;
 
 // =================================================================================
+// ANTI-DEBUG PROTECTION (Must be after g_generalLogger declaration)
+// =================================================================================
+bool IsDebuggerAttached() {
+    // Technique 1: IsDebuggerPresent (Basic check)
+    if (IsDebuggerPresent()) {
+        g_generalLogger.log(L"[ANTI-DEBUG] Technique #1 triggered: IsDebuggerPresent");
+        return true;
+    }
+
+    // Technique 2: CheckRemoteDebuggerPresent
+    BOOL isDebuggerPresent = FALSE;
+    if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &isDebuggerPresent) && isDebuggerPresent) {
+        g_generalLogger.log(L"[ANTI-DEBUG] Technique #2 triggered: CheckRemoteDebuggerPresent");
+        return true;
+    }
+
+    // Technique 3: NtQueryInformationProcess - ProcessDebugPort
+    HMODULE hNtdll = GetModuleHandleA("ntdll.dll");
+    if (hNtdll) {
+        pNtQueryInformationProcess NtQIP = (pNtQueryInformationProcess)GetProcAddress(hNtdll, "NtQueryInformationProcess");
+        if (NtQIP) {
+            DWORD debugPort = 0;
+            NTSTATUS status = NtQIP(GetCurrentProcess(), ProcessDebugPort, &debugPort, sizeof(debugPort), NULL);
+            if (status == 0 && debugPort != 0) {
+                g_generalLogger.log(L"[ANTI-DEBUG] Technique #3 triggered: ProcessDebugPort = " + std::to_wstring(debugPort));
+                return true;
+            }
+
+            // Technique 4: ProcessDebugObjectHandle
+            HANDLE debugObject = NULL;
+            status = NtQIP(GetCurrentProcess(), ProcessDebugObjectHandle, &debugObject, sizeof(debugObject), NULL);
+            if (status == 0 && debugObject != NULL) {
+                g_generalLogger.log(L"[ANTI-DEBUG] Technique #4 triggered: ProcessDebugObjectHandle");
+                CloseHandle(debugObject);
+                return true;
+            }
+
+            // Technique 5: ProcessDebugFlags (NoDebugInherit)
+            DWORD debugFlags = 0;
+            status = NtQIP(GetCurrentProcess(), ProcessDebugFlags, &debugFlags, sizeof(debugFlags), NULL);
+            if (status == 0 && debugFlags == 0) {
+                g_generalLogger.log(L"[ANTI-DEBUG] Technique #5 triggered: ProcessDebugFlags = 0");
+                return true;
+            }
+        }
+    }
+
+    // Technique 6: Hardware Breakpoint Detection (Check DR registers)
+    CONTEXT ctx = {};
+    ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
+    if (GetThreadContext(GetCurrentThread(), &ctx)) {
+        if (ctx.Dr0 != 0 || ctx.Dr1 != 0 || ctx.Dr2 != 0 || ctx.Dr3 != 0) {
+            g_generalLogger.log(L"[ANTI-DEBUG] Technique #6 triggered: Hardware Breakpoints detected");
+            return true;
+        }
+    }
+
+    // Technique 7: Timing Check (RDTSC - Detect single-stepping)
+    // DISABLED: Too prone to false positives due to CPU power management and context switching
+    /*
+    ULONGLONG startTick = __rdtsc();
+    volatile int dummy = 0;
+    for (int i = 0; i < 10; i++) dummy++;
+    ULONGLONG endTick = __rdtsc();
+    // Increased threshold to 500000 to prevent false positives
+    if ((endTick - startTick) > 500000) {
+        g_generalLogger.log(L"[ANTI-DEBUG] Technique #7 triggered: Timing anomaly (cycles: " + std::to_wstring(endTick - startTick) + L")");
+        return true;
+    }
+    */
+
+    // Technique 8: Parent Process Check (check if launched by debugger)
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnapshot != INVALID_HANDLE_VALUE) {
+        PROCESSENTRY32W pe = { sizeof(PROCESSENTRY32W) };
+        DWORD currentPID = GetCurrentProcessId();
+        DWORD parentPID = 0;
+
+        if (Process32FirstW(hSnapshot, &pe)) {
+            do {
+                if (pe.th32ProcessID == currentPID) {
+                    parentPID = pe.th32ParentProcessID;
+                    break;
+                }
+            } while (Process32NextW(hSnapshot, &pe));
+        }
+
+        // Get parent process name
+        if (parentPID != 0 && Process32FirstW(hSnapshot, &pe)) {
+            do {
+                if (pe.th32ProcessID == parentPID) {
+                    std::wstring parentName = pe.szExeFile;
+                    std::transform(parentName.begin(), parentName.end(), parentName.begin(), ::tolower);
+
+                    // Common debugger process names
+                    if (parentName.find(L"x64dbg") != std::wstring::npos ||
+                        parentName.find(L"x32dbg") != std::wstring::npos ||
+                        parentName.find(L"ollydbg") != std::wstring::npos ||
+                        parentName.find(L"windbg") != std::wstring::npos ||
+                        parentName.find(L"ida") != std::wstring::npos ||
+                        parentName.find(L"ghidra") != std::wstring::npos ||
+                        parentName.find(L"cheatengine") != std::wstring::npos ||
+                        parentName.find(L"processhacker") != std::wstring::npos) {
+                        g_generalLogger.log(L"[ANTI-DEBUG] Technique #8 triggered: Debugger parent process: " + parentName);
+                        CloseHandle(hSnapshot);
+                        return true;
+                    }
+                    break;
+                }
+            } while (Process32NextW(hSnapshot, &pe));
+        }
+        CloseHandle(hSnapshot);
+    }
+
+    // Technique 9: Check for common debugger windows
+    if (FindWindowA("OLLYDBG", NULL) != NULL) {
+        g_generalLogger.log(L"[ANTI-DEBUG] Technique #9 triggered: OllyDbg window detected");
+        return true;
+    }
+    if (FindWindowA("WinDbgFrameClass", NULL) != NULL) {
+        g_generalLogger.log(L"[ANTI-DEBUG] Technique #9 triggered: WinDbg window detected");
+        return true;
+    }
+    if (FindWindowA("Qt5QWindowIcon", NULL) != NULL) {
+        g_generalLogger.log(L"[ANTI-DEBUG] Technique #9 triggered: x64dbg window detected");
+        return true;
+    }
+    if (FindWindowA("ID", NULL) != NULL) {
+        g_generalLogger.log(L"[ANTI-DEBUG] Technique #9 triggered: IDA Pro window detected");
+        return true;
+    }
+    if (FindWindowA("ProcessHacker", NULL) != NULL) {
+        g_generalLogger.log(L"[ANTI-DEBUG] Technique #9 triggered: Process Hacker window detected");
+        return true;
+    }
+
+    // Technique 10: SeDebugPrivilege check
+    // DISABLED: Too many false positives when running as Administrator
+    /*
+    HANDLE hToken;
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
+        LUID luid;
+        if (LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &luid)) {
+            PRIVILEGE_SET ps;
+            ps.PrivilegeCount = 1;
+            ps.Control = PRIVILEGE_SET_ALL_NECESSARY;
+            ps.Privilege[0].Luid = luid;
+            ps.Privilege[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+            BOOL result = FALSE;
+            if (PrivilegeCheck(hToken, &ps, &result) && result) {
+                g_generalLogger.log(L"[ANTI-DEBUG] Technique #10 triggered: SeDebugPrivilege detected");
+                CloseHandle(hToken);
+                return true;
+            }
+        }
+        CloseHandle(hToken);
+    }
+    */
+
+    return false;
+}
+
+void HandleDebuggerDetection() {
+    g_generalLogger.log(L"[SECURITY] Debugger detected - Terminating");
+
+    // Terminate game if launched
+    if (g_gameProcessLaunched) {
+        TerminateProcessByName(Config::TARGET_PROCESS);
+    }
+
+    g_isRunning = false;
+
+    // Don't show obvious error message to debugger
+    ShowFriendlyError(L"Terjadi kesalahan sistem. Kode: 0x80070057", 999, true);
+}
+
+// =================================================================================
+// VM / SANDBOX DETECTION (TIER A - Security Enhancement)
+// =================================================================================
+bool IsRunningInVM() {
+    g_generalLogger.log(L"[VM-CHECK] Starting VM/Sandbox detection...");
+
+    // Check 1: VMware detection via registry
+    HKEY hKey;
+    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\VMware, Inc.\\VMware Tools", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        RegCloseKey(hKey);
+        g_generalLogger.log(L"[VM-CHECK] DETECTED: VMware (Registry key found)");
+        return true;
+    }
+
+    // Check 2: VirtualBox detection
+    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Oracle\\VirtualBox Guest Additions", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        RegCloseKey(hKey);
+        g_generalLogger.log(L"[VM-CHECK] DETECTED: VirtualBox (Registry key found)");
+        return true;
+    }
+
+    // Check 3: Check for VM processes
+    const wchar_t* vmProcesses[] = {
+        L"vmtoolsd.exe", L"vmwaretray.exe", L"vmwareuser.exe",
+        L"vboxservice.exe", L"vboxtray.exe",
+        L"xenservice.exe", L"qemu-ga.exe"
+    };
+
+    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnap != INVALID_HANDLE_VALUE) {
+        PROCESSENTRY32W pe = { sizeof(PROCESSENTRY32W) };
+        if (Process32FirstW(hSnap, &pe)) {
+            do {
+                std::wstring procName = pe.szExeFile;
+                std::transform(procName.begin(), procName.end(), procName.begin(), ::tolower);
+
+                for (const auto& vmProc : vmProcesses) {
+                    std::wstring vmProcLower = vmProc;
+                    std::transform(vmProcLower.begin(), vmProcLower.end(), vmProcLower.begin(), ::tolower);
+
+                    if (procName == vmProcLower) {
+                        g_generalLogger.log(L"[VM-CHECK] DETECTED: VM process found: " + procName);
+                        CloseHandle(hSnap);
+                        return true;
+                    }
+                }
+            } while (Process32NextW(hSnap, &pe));
+        }
+        CloseHandle(hSnap);
+    }
+
+    // Check 4: Check for Sandboxie
+    if (GetModuleHandleA("SbieDll.dll") != NULL) {
+        g_generalLogger.log(L"[VM-CHECK] DETECTED: Sandboxie (SbieDll.dll loaded)");
+        return true;
+    }
+
+    // Check 5: Check MAC address (VMware uses 00:05:69, 00:0C:29, 00:50:56)
+    // This is more complex, skipping for now
+
+    g_generalLogger.log(L"[VM-CHECK] No VM/Sandbox detected - Running on real hardware");
+    return false;
+}
+
+// =================================================================================
+// JOB OBJECT - AUTOMATIC CHILD PROCESS TERMINATION
+// =================================================================================
+bool CreateJobObjectForAutoKill() {
+    g_generalLogger.log(L"[JOB] Creating job object for automatic child termination...");
+
+    // Create a job object
+    g_hJobObject = CreateJobObject(NULL, NULL);
+    if (g_hJobObject == NULL) {
+        g_generalLogger.log(L"[JOB] ERROR: Failed to create job object. Error code: " + std::to_wstring(GetLastError()));
+        return false;
+    }
+
+    // Configure job to kill all processes when job handle is closed
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
+    jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+
+    if (!SetInformationJobObject(g_hJobObject, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli))) {
+        g_generalLogger.log(L"[JOB] ERROR: Failed to set job information. Error code: " + std::to_wstring(GetLastError()));
+        CloseHandle(g_hJobObject);
+        g_hJobObject = NULL;
+        return false;
+    }
+
+    // Add current process (launcher) to job
+    if (!AssignProcessToJobObject(g_hJobObject, GetCurrentProcess())) {
+        g_generalLogger.log(L"[JOB] ERROR: Failed to assign launcher to job. Error code: " + std::to_wstring(GetLastError()));
+        CloseHandle(g_hJobObject);
+        g_hJobObject = NULL;
+        return false;
+    }
+
+    g_generalLogger.log(L"[JOB] Job object created successfully");
+    g_generalLogger.log(L"[JOB] Launcher process assigned to job - All child processes will auto-terminate with launcher");
+    return true;
+}
+
+bool AddProcessToJob(HANDLE hProcess) {
+    if (g_hJobObject == NULL) {
+        g_generalLogger.log(L"[JOB] ERROR: Job object is NULL, cannot add process");
+        return false;
+    }
+
+    if (!AssignProcessToJobObject(g_hJobObject, hProcess)) {
+        DWORD error = GetLastError();
+        g_generalLogger.log(L"[JOB] ERROR: Failed to add process to job. Error code: " + std::to_wstring(error));
+        return false;
+    }
+
+    g_generalLogger.log(L"[JOB] Process successfully added to job object");
+    return true;
+}
+
+// =================================================================================
+// ANIMATED LOADING (TIER A - UX Enhancement)
+// =================================================================================
+class LoadingAnimation {
+private:
+    const wchar_t* frames[10] = {
+        L"⠋", L"⠙", L"⠹", L"⠸", L"⠼", L"⠴", L"⠦", L"⠧", L"⠇", L"⠏"
+    };
+    int currentFrame = 0;
+    std::wstring message;
+    bool isRunning = false;
+    std::thread animThread;
+
+    void animate() {
+        while (isRunning) {
+            SetColor(COLOR_INFO);
+            std::wcout << L"\r  [" << frames[currentFrame] << L"] " << message << L"          ";
+            std::wcout.flush();
+            currentFrame = (currentFrame + 1) % 10;
+            Sleep(80); // 80ms per frame = smooth animation
+        }
+    }
+
+public:
+    void start(const std::wstring& msg) {
+        message = msg;
+        currentFrame = 0;
+        isRunning = true;
+        animThread = std::thread(&LoadingAnimation::animate, this);
+    }
+
+    void update(const std::wstring& msg) {
+        message = msg;
+    }
+
+    void stop(const std::wstring& finalMsg, bool success = true) {
+        isRunning = false;
+        if (animThread.joinable()) animThread.join();
+
+        SetColor(success ? COLOR_SUCCESS : COLOR_ERROR);
+        std::wcout << L"\r  [" << (success ? L"✓" : L"✗") << L"] " << finalMsg;
+        // Pad with spaces to clear previous text
+        std::wcout << L"                                        \n";
+        SetColor(COLOR_DEFAULT);
+    }
+};
+
+// Progress bar animation
+void ShowProgressBar(const std::wstring& label, int percent) {
+    int barWidth = 30;
+    int filled = (barWidth * percent) / 100;
+
+    SetColor(COLOR_INFO);
+    std::wcout << L"\r  " << label << L" [";
+
+    for (int i = 0; i < barWidth; i++) {
+        if (i < filled) {
+            SetColor(COLOR_SUCCESS);
+            std::wcout << L"█";
+        } else {
+            SetColor(COLOR_DEFAULT);
+            std::wcout << L"░";
+        }
+    }
+
+    SetColor(COLOR_INFO);
+    std::wcout << L"] " << percent << L"%   ";
+    std::wcout.flush();
+    SetColor(COLOR_DEFAULT);
+}
+
+// =================================================================================
 // UI HELPER FUNCTIONS
 // =================================================================================
 void SetColor(int color) {
@@ -262,26 +656,104 @@ void SetColor(int color) {
 }
 
 void LogDebug(const std::wstring& msg) {
+    // Only write to log file, not to console (user-friendly)
     g_generalLogger.log(L"[DEBUG] " + msg);
-    try {
-        SetColor(COLOR_DEBUG);
-        std::wcout << L"  [DEBUG] " << msg << L"\n";
-        SetColor(COLOR_DEFAULT);
-    } catch (...) {
-        g_generalLogger.log(L"ERROR: LogDebug() console output failed");
-    }
 }
+
+// Animated ASCII Art Banner
+class AnimatedBanner {
+private:
+    std::atomic<bool> isRunning{false};
+    std::thread animThread;
+    int colorOffset = 0;
+
+    const std::wstring asciiArt[9] = {
+        L"  ╔═══════════════════════════════════════════════════════════════╗",
+        L"  ║    ██╗ ██████╗███████╗    ████████╗ ██████╗  ██████╗ ██╗     ║",
+        L"  ║    ██║██╔════╝██╔════╝    ╚══██╔══╝██╔═══██╗██╔═══██╗██║     ║",
+        L"  ║    ██║██║     █████╗  █████╗██║   ██║   ██║██║   ██║██║     ║",
+        L"  ║    ██║██║     ██╔══╝  ╚════╝██║   ██║   ██║██║   ██║██║     ║",
+        L"  ║    ██║╚██████╗███████╗      ██║   ╚██████╔╝╚██████╔╝███████╗║",
+        L"  ║    ╚═╝ ╚═════╝╚══════╝      ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝║",
+        L"  ║              🎮  Secure Launcher v1.7  🎮                    ║",
+        L"  ╚═══════════════════════════════════════════════════════════════╝"
+    };
+
+    void animate() {
+        int rainbowColors[] = {12, 14, 10, 11, 9, 13}; // Red, Yellow, Green, Cyan, Blue, Magenta
+        int numColors = 6;
+
+        while (isRunning) {
+            // Clear previous
+            COORD coord = {0, 0};
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+
+            // Draw with rainbow wave effect
+            for (int i = 0; i < 9; i++) {
+                int colorIndex = (i + colorOffset) % numColors;
+                SetColor(rainbowColors[colorIndex]);
+                std::wcout << asciiArt[i] << L"\n";
+            }
+
+            // Loading text
+            SetColor(COLOR_INFO);
+            std::wcout << L"\n";
+
+            // Animated dots
+            int dotCount = (colorOffset / 3) % 4;
+            std::wcout << L"                    🚀 Initializing";
+            for (int i = 0; i < dotCount; i++) std::wcout << L".";
+            for (int i = dotCount; i < 3; i++) std::wcout << L" ";
+            std::wcout << L"                    \n";
+
+            SetColor(COLOR_DEFAULT);
+
+            colorOffset++;
+            if (colorOffset >= numColors * 100) colorOffset = 0;
+
+            Sleep(150); // Animation speed
+        }
+    }
+
+public:
+    void start() {
+        // Clear screen first
+        system("cls");
+
+        isRunning = true;
+        animThread = std::thread(&AnimatedBanner::animate, this);
+        g_generalLogger.log(L"Animated banner started");
+    }
+
+    void stop() {
+        isRunning = false;
+        if (animThread.joinable()) {
+            animThread.join();
+        }
+
+        // Clear screen and show final banner
+        system("cls");
+
+        // Draw final static banner
+        SetColor(COLOR_SUCCESS);
+        for (int i = 0; i < 9; i++) {
+            std::wcout << asciiArt[i] << L"\n";
+        }
+
+        SetColor(COLOR_SUCCESS);
+        std::wcout << L"\n                ✅ Initialization Complete!\n\n";
+        SetColor(COLOR_DEFAULT);
+
+        g_generalLogger.log(L"Animated banner stopped");
+    }
+};
+
+AnimatedBanner g_banner;
 
 void DrawBanner() {
     g_generalLogger.log(L"DrawBanner() - START");
     try {
-        SetColor(COLOR_INFO);
-        std::wcout << L"\n";
-        std::wcout << L"    ==============================================\n";
-        std::wcout << L"            JCE TOOLS LAUNCHER v1.7 (DEBUG)       \n";
-        std::wcout << L"         Secure Access & Validation System         \n";
-        std::wcout << L"    ==============================================\n\n";
-        SetColor(COLOR_DEFAULT);
+        g_banner.start();
         g_generalLogger.log(L"DrawBanner() - SUCCESS");
     } catch (const std::exception& e) {
         g_generalLogger.log(L"ERROR: DrawBanner() exception: " + string_to_wstring(std::string(e.what())));
@@ -715,18 +1187,42 @@ std::string ciphertextToHex(const std::vector<unsigned char>& ct) {
 // CORE LOGIC 1: VERIFY HWID
 // =================================================================================
 int VerifyLicenseHWID(bool isInitialCheck) {
-    if (isInitialCheck) PrintStatus(L"Mode Otomatis (HWID)", L"Checking...", COLOR_WARN);
+    LoadingAnimation loader;
+
+    if (isInitialCheck) {
+        std::wcout << L"\n";
+        loader.start(L"Menghubungi server lisensi...");
+        Sleep(500);
+    }
 
     std::string sessionToken = RequestSessionKeyHWID();
     if (sessionToken.empty()) {
-        if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Koneksi ke server gagal, mencoba ulang...");
+        if (isInitialCheck) {
+            loader.stop(L"Gagal menghubungi server", false);
+        } else {
+            g_generalLogger.log(L"Pemeriksaan: Koneksi ke server gagal, mencoba ulang...");
+        }
         return 2;
+    }
+
+    if (isInitialCheck) {
+        loader.update(L"Menerima kunci enkripsi...");
+        Sleep(300);
     }
 
     SessionKeyData sessionData = ParseJWTToken(sessionToken);
     if (!sessionData.valid) {
-        if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Respon server tidak valid");
+        if (isInitialCheck) {
+            loader.stop(L"Respon server tidak valid", false);
+        } else {
+            g_generalLogger.log(L"Pemeriksaan: Respon server tidak valid");
+        }
         return 2;
+    }
+
+    if (isInitialCheck) {
+        loader.update(L"Mengenkripsi ID perangkat Anda...");
+        Sleep(400);
     }
 
     DWORD hwid_val = GetVolumeSerialNumberFromCurrentDrive();
@@ -739,10 +1235,24 @@ int VerifyLicenseHWID(bool isInitialCheck) {
     encrypt_standard(plaintext, key, iv, ciphertext);
     std::string encryptedString = ciphertextToHex(ciphertext);
 
+    if (isInitialCheck) {
+        loader.update(L"Memverifikasi HWID dengan database...");
+        Sleep(300);
+    }
+
     std::string response = SendHWIDRequest(encryptedString, sessionToken);
     if (response.empty()) {
-        if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Server tidak merespon, mencoba ulang...");
+        if (isInitialCheck) {
+            loader.stop(L"Server tidak merespon", false);
+        } else {
+            g_generalLogger.log(L"Pemeriksaan: Server tidak merespon, mencoba ulang...");
+        }
         return 2;
+    }
+
+    if (isInitialCheck) {
+        loader.update(L"Memeriksa status lisensi...");
+        Sleep(400);
     }
 
     try {
@@ -752,11 +1262,17 @@ int VerifyLicenseHWID(bool isInitialCheck) {
         if (status == "success") {
             if (isInitialCheck) {
                 std::string user = jsonResponse.value("user", "User");
-                PrintStatus(L"Status Lisensi", L"HWID Terdaftar [OK]", COLOR_SUCCESS);
+                loader.stop(L"Login berhasil! Selamat datang, " + string_to_wstring(user), true);
+
                 std::wcout << L"\n";
+                SetColor(COLOR_SUCCESS);
+                std::wcout << L"  ╔════════════════════════════════════════════╗\n";
+                std::wcout << L"  ║         AUTENTIKASI BERHASIL               ║\n";
+                std::wcout << L"  ╚════════════════════════════════════════════╝\n";
                 SetColor(COLOR_INFO);
                 std::wcout << L"  [+] Login sebagai    : " << string_to_wstring(user) << L"\n";
                 std::wcout << L"  [+] Metode Akses     : HWID (Automatic)\n";
+                std::wcout << L"  [+] Status           : Terdaftar & Aktif\n";
                 SetColor(COLOR_DEFAULT);
             } else {
                 // Background check success
@@ -767,15 +1283,25 @@ int VerifyLicenseHWID(bool isInitialCheck) {
         else {
             std::string msg = jsonResponse.value("message", "");
             if (msg.find("not found") != std::string::npos || jsonResponse.value("code", "") == "NOT_FOUND") {
+                if (isInitialCheck) {
+                    loader.stop(L"HWID tidak terdaftar", false);
+                }
                 return 0; // Trigger Login Manual
             }
             if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Verifikasi ditolak oleh server");
-            if (isInitialCheck) ShowFriendlyError(string_to_wstring(msg), 302, true);
+            if (isInitialCheck) {
+                loader.stop(L"Verifikasi ditolak: " + string_to_wstring(msg), false);
+                ShowFriendlyError(string_to_wstring(msg), 302, true);
+            }
             return 2;
         }
     }
     catch (...) {
-        if (!isInitialCheck) g_generalLogger.log(L"Pemeriksaan: Terjadi kesalahan, mencoba ulang...");
+        if (isInitialCheck) {
+            loader.stop(L"Terjadi kesalahan saat parsing respon", false);
+        } else {
+            g_generalLogger.log(L"Pemeriksaan: Terjadi kesalahan, mencoba ulang...");
+        }
         return 2;
     }
 }
@@ -956,6 +1482,18 @@ void CleanupAndExit() {
     } else {
         g_generalLogger.log(L"Program ditutup (game belum dijalankan)");
     }
+
+    // Close game process handle if we have it
+    if (g_hGameProcess != NULL) {
+        CloseHandle(g_hGameProcess);
+        g_hGameProcess = NULL;
+    }
+
+    // Close job object handle if we have it
+    if (g_hJobObject != NULL) {
+        CloseHandle(g_hJobObject);
+        g_hJobObject = NULL;
+    }
 }
 
 BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
@@ -1019,10 +1557,33 @@ bool VerifyWithRetry(AuthMode mode, int maxRetries) {
     return false;
 }
 
+void AntiDebugThread() {
+    g_generalLogger.log(L"[SECURITY] Anti-debug monitoring thread started");
+
+    while (g_isRunning) {
+        // Check every 2 seconds for debugger
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        if (!g_isRunning) break;
+
+        if (IsDebuggerAttached()) {
+            g_generalLogger.log(L"[SECURITY] Debugger detected during runtime - Terminating");
+            HandleDebuggerDetection();
+            break;
+        }
+    }
+
+    g_generalLogger.log(L"[SECURITY] Anti-debug monitoring thread stopped");
+}
+
 void BackgroundThread() {
     int fails = 0;
     while (g_isRunning) {
-        std::this_thread::sleep_for(std::chrono::minutes(Config::BACKGROUND_CHECK_MINUTES));
+        // Interruptible sleep: sleep in 1-second chunks instead of 5 minutes straight
+        // This allows the thread to exit quickly when g_isRunning becomes false
+        int sleepSeconds = Config::BACKGROUND_CHECK_MINUTES * 60; // Convert minutes to seconds
+        for (int i = 0; i < sleepSeconds && g_isRunning; i++) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
         if (!g_isRunning) break;
 
         // Log background check start with timestamp
@@ -1060,6 +1621,12 @@ void BackgroundThread() {
 }
 void HideConsole() {
     ShowWindow(GetConsoleWindow(), SW_HIDE);
+    g_generalLogger.log(L"Console window hidden");
+}
+
+void ShowConsole() {
+    ShowWindow(GetConsoleWindow(), SW_SHOW);
+    g_generalLogger.log(L"Console window shown");
 }
 
 bool InjectDLL(DWORD processID, const std::wstring& dllPath) {
@@ -1126,11 +1693,8 @@ void LaunchAndInject() {
     std::wstring auditionExePath; // Declare outside try block
 
     try {
-        PrintStatus(L"Debug Info", L"Mengecek File Game...", COLOR_INFO);
-
         auditionExePath = GetExecutablePath(Config::TARGET_PROCESS);
         g_generalLogger.log(L"LaunchAndInject() - Game path: " + auditionExePath);
-        // [DEBUG] PRINT PATH
         LogDebug(L"Path Game yang dicari: " + auditionExePath);
 
         if (!PathFileExistsW(auditionExePath.c_str())) {
@@ -1148,7 +1712,6 @@ void LaunchAndInject() {
     }
 
     g_generalLogger.log(L"LaunchAndInject() - Cleaning old processes...");
-    PrintStatus(L"Debug Info", L"Membersihkan Proses Lama...", COLOR_INFO);
     TerminateProcessByName(Config::TARGET_PROCESS);
     Sleep(1000);
 
@@ -1162,8 +1725,6 @@ void LaunchAndInject() {
     wchar_t fullCommand[1024];
     swprintf_s(fullCommand, _countof(fullCommand), L"\"%s\" %s", auditionExePath.c_str(), Config::LAUNCH_ARGS.c_str());
     g_generalLogger.log(L"LaunchAndInject() - Command: " + std::wstring(fullCommand));
-
-    PrintStatus(L"Debug Info", L"Memulai Game...", COLOR_INFO);
     g_generalLogger.log(L"LaunchAndInject() - Calling CreateProcessW...");
 
     if (!CreateProcessW(NULL, fullCommand, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
@@ -1174,11 +1735,19 @@ void LaunchAndInject() {
     }
     g_generalLogger.log(L"LaunchAndInject() - CreateProcessW SUCCESS, PID: " + std::to_wstring(pi.dwProcessId));
 
-    PrintStatus(L"Debug Info", L"Menunggu Window Game...", COLOR_INFO);
+    // Add Audition.exe to job object for automatic termination
+    if (g_hJobObject != NULL) {
+        if (AddProcessToJob(pi.hProcess)) {
+            g_generalLogger.log(L"[JOB] Audition.exe (PID: " + std::to_wstring(pi.dwProcessId) + L") added to job");
+            g_generalLogger.log(L"[JOB] Game will auto-terminate if launcher is killed");
+        } else {
+            g_generalLogger.log(L"[JOB] WARNING: Failed to add Audition.exe to job - using manual cleanup");
+        }
+    }
+
     g_generalLogger.log(L"LaunchAndInject() - Waiting for game window...");
     HWND hAuditionWindow = NULL;
 
-    // [DEBUG] Counter
     int waitCount = 0;
     for (int i = 0; i < 120; ++i) {
         hAuditionWindow = FindWindowW(NULL, Config::TARGET_WINDOW_TITLE.c_str());
@@ -1218,17 +1787,25 @@ void LaunchAndInject() {
         return;
     }
     g_generalLogger.log(L"LaunchAndInject() - DLL file found");
-
-    PrintStatus(L"Debug Info", L"Menyuntikkan DLL...", COLOR_INFO);
     g_generalLogger.log(L"LaunchAndInject() - Starting DLL injection...");
 
     if (InjectDLL(pi.dwProcessId, fullDllPath)) {
+        // Stop the animated banner - show final success screen
+        g_banner.stop();
+
         PrintStatus(L"Status Injeksi", L"Berhasil [OK]", COLOR_SUCCESS);
         g_gameProcessLaunched = true; // Mark game as launched
         g_generalLogger.log(L"LaunchAndInject() - DLL injection SUCCESS");
         g_generalLogger.log(L"LaunchAndInject() - Game successfully launched and injected");
         g_generalLogger.separator();
-        Sleep(1500);
+
+        SetColor(COLOR_SUCCESS);
+        std::wcout << L"\n  ╔════════════════════════════════════════════╗\n";
+        std::wcout << L"  ║     🎉  SEMUA SIAP! SELAMAT BERMAIN  🎉    ║\n";
+        std::wcout << L"  ╚════════════════════════════════════════════╝\n\n";
+        SetColor(COLOR_DEFAULT);
+
+        Sleep(2000);
         HideConsole();
     }
     else {
@@ -1241,7 +1818,10 @@ void LaunchAndInject() {
         exit(1);
     }
 
-    if (pi.hProcess) CloseHandle(pi.hProcess);
+    // DON'T close pi.hProcess yet - we need it for efficient monitoring!
+    // Store it globally
+    g_hGameProcess = pi.hProcess;
+
     if (pi.hThread) CloseHandle(pi.hThread);
 
     g_generalLogger.log(L"LaunchAndInject() - END");
@@ -1251,21 +1831,71 @@ void LaunchAndInject() {
 // ENTRY POINT
 // =================================================================================
 int main() {
+    // ========== CRITICAL: ANTI-DEBUG CHECK FIRST ==========
+    // Must be first thing to prevent debugging
+    if (IsDebuggerAttached()) {
+        HandleDebuggerDetection();
+        return 1;
+    }
+
     // ULTRA-EARLY LOGGING - First thing in main()
     g_generalLogger.log(L"");
     g_generalLogger.log(L"!!! ENTERED main() FUNCTION !!!");
     g_generalLogger.log(L"!!! THIS IS PROOF THAT main() WAS CALLED !!!");
+    g_generalLogger.log(L"[SECURITY] Initial anti-debug check: PASSED");
     g_generalLogger.separator();
 
-    // Show MessageBox as visual confirmation
-    MessageBoxW(NULL, L"main() has been called!\nCheck log.jce for details.", L"DEBUG: main() Called", MB_OK | MB_ICONINFORMATION);
+    // Log executable path and working directory
+    wchar_t exePath[MAX_PATH];
+    GetModuleFileNameW(NULL, exePath, MAX_PATH);
+    g_generalLogger.log(L"Executable full path: " + std::wstring(exePath));
+
+    wchar_t workDir[MAX_PATH];
+    GetCurrentDirectoryW(MAX_PATH, workDir);
+    g_generalLogger.log(L"Current working directory: " + std::wstring(workDir));
+
+    wchar_t exeDir[MAX_PATH];
+    wcscpy_s(exeDir, exePath);
+    PathRemoveFileSpecW(exeDir);
+    g_generalLogger.log(L"Executable directory: " + std::wstring(exeDir));
+
+    // Check if cacert.pem exists
+    std::wstring certCheck = std::wstring(exeDir) + L"\\cacert.pem";
+    DWORD certAttr = GetFileAttributesW(certCheck.c_str());
+    g_generalLogger.log(L"Checking cacert.pem at: " + certCheck);
+    g_generalLogger.log(L"cacert.pem exists: " + std::wstring(certAttr != INVALID_FILE_ATTRIBUTES ? L"YES" : L"NO"));
+
+    // List all DLLs in executable directory
+    g_generalLogger.log(L"Listing DLL files in executable directory:");
+    WIN32_FIND_DATAW findData;
+    HANDLE hFind = FindFirstFileW((std::wstring(exeDir) + L"\\*.dll").c_str(), &findData);
+    if (hFind != INVALID_HANDLE_VALUE) {
+        do {
+            g_generalLogger.log(L"  - Found DLL: " + std::wstring(findData.cFileName));
+        } while (FindNextFileW(hFind, &findData));
+        FindClose(hFind);
+    } else {
+        g_generalLogger.log(L"  - No DLL files found or error listing");
+    }
+    g_generalLogger.separator();
+
+    // Show MessageBox as visual confirmation (REMOVE THIS AFTER DEBUGGING)
+    // MessageBoxW(NULL, L"main() has been called!\nCheck log.jce for details.", L"DEBUG: main() Called", MB_OK | MB_ICONINFORMATION);
 
     try {
         g_generalLogger.log(L"Calling SetConsoleTitle...");
-        SetConsoleTitle(L"JCE Tools Launcher - Hybrid Auth (DEBUG MODE)");
+        SetConsoleTitle(L"JCE Tools Launcher");
         g_generalLogger.log(L"SetConsoleTitle OK");
 
         g_generalLogger.log(L"=== Program Started ===");
+
+        // Create Job Object for automatic child process termination
+        g_generalLogger.log(L"Step 0: Creating job object...");
+        if (!CreateJobObjectForAutoKill()) {
+            g_generalLogger.log(L"WARNING: Failed to create job object. Manual cleanup will be used.");
+            // Continue anyway - we still have manual cleanup as fallback
+        }
+
         g_generalLogger.log(L"Step 1: Drawing banner...");
         DrawBanner();
 
@@ -1312,10 +1942,18 @@ int main() {
             SetFileAttributesW(certW.c_str(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
         }
 
-        g_generalLogger.log(L"Step 5: Checking for updates...");
+        // VM/Sandbox Detection (TIER A - Security)
+        g_generalLogger.log(L"Step 5: Checking environment security...");
+        if (IsRunningInVM()) {
+            g_generalLogger.log(L"[SECURITY] Running in VM/Sandbox - Blocking execution");
+            ShowFriendlyError(L"Program tidak dapat dijalankan di lingkungan virtual atau sandbox.\nHarap jalankan di komputer asli.", 999, true);
+            return 1;
+        }
+
+        g_generalLogger.log(L"Step 6: Checking for updates...");
         CheckForUpdates();
 
-        g_generalLogger.log(L"Step 6: Starting initial check...");
+        g_generalLogger.log(L"Step 7: Starting initial check...");
         LogDebug(L"Entering InitialCheck...");
         InitialCheck();
         LogDebug(L"InitialCheck Returned.");
@@ -1332,53 +1970,62 @@ int main() {
         LaunchAndInject();
         LogDebug(L"LaunchAndInject Returned.");
 
-        Sleep(3000);
-        // HideConsole(); // Disable hide for debug
-
-        g_generalLogger.log(L"Step 8: Starting background monitoring thread...");
+        g_generalLogger.log(L"Step 8: Starting background monitoring threads...");
         std::thread bgThread(BackgroundThread);
+        std::thread antiDebugThread(AntiDebugThread);
 
-        g_generalLogger.log(L"Step 9: Entering main monitoring loop...");
-        while (g_isRunning) {
-            bool isGameRunning = false;
+        g_generalLogger.log(L"Step 9: Entering EFFICIENT monitoring loop...");
+        g_generalLogger.log(L"Using WaitForSingleObject - 0% CPU usage, instant detection!");
 
-            HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-            if (hSnap != INVALID_HANDLE_VALUE) {
-                PROCESSENTRY32W pe; pe.dwSize = sizeof(pe);
-                if (Process32FirstW(hSnap, &pe)) {
-                    do {
-                        if (wcscmp(pe.szExeFile, Config::TARGET_PROCESS.c_str()) == 0) {
-                            isGameRunning = true;
-                            break;
-                        }
-                    } while (Process32NextW(hSnap, &pe));
-                }
-                CloseHandle(hSnap);
-            }
-
-            if (!isGameRunning) {
-                LogDebug(L"Game process lost. Closing launcher...");
-                g_generalLogger.log(L"Game ditutup oleh pengguna");
-                g_isRunning = false;
-            }
-
-            Sleep(5000);
+        // Wait for game to launch first
+        while (!g_gameProcessLaunched && g_isRunning) {
+            g_generalLogger.log(L"[MONITOR] Waiting for game to be launched...");
+            Sleep(1000);
         }
 
-        g_generalLogger.log(L"Step 10: Main loop exited, waiting for background thread...");
+        if (g_isRunning && g_hGameProcess != NULL) {
+            g_generalLogger.log(L"[MONITOR] Game process handle obtained - Starting efficient monitoring");
+            g_generalLogger.log(L"[MONITOR] Monitoring mode: WaitForSingleObject (Blocking until process exits)");
+
+            // TIER A: Efficient Process Monitoring
+            // WaitForSingleObject blocks until process exits - NO POLLING!
+            // This uses 0% CPU compared to ~1-2% with polling
+            DWORD waitResult = WaitForSingleObject(g_hGameProcess, INFINITE);
+
+            // If we reach here, game has exited!
+            g_generalLogger.log(L"===== GAME CLOSED - TERMINATING LAUNCHER =====");
+            g_generalLogger.log(L"WaitForSingleObject returned - Audition.exe has exited");
+            g_generalLogger.log(L"Wait result: " + std::to_wstring(waitResult));
+
+            // Show console window so user can see the notification
+            ShowConsole();
+
+            SetColor(COLOR_WARN);
+            std::wcout << L"\n\n";
+            std::wcout << L"  ╔════════════════════════════════════════════╗\n";
+            std::wcout << L"  ║   AUDITION.EXE TELAH DITUTUP               ║\n";
+            std::wcout << L"  ║   Menutup launcher dalam 3 detik...        ║\n";
+            std::wcout << L"  ╚════════════════════════════════════════════╝\n\n";
+            SetColor(COLOR_DEFAULT);
+
+            g_isRunning = false;
+
+            // Give user time to see message before closing
+            for (int i = 3; i > 0; i--) {
+                std::wcout << L"  Closing in " << i << L"...\n";
+                Sleep(1000);
+            }
+        }
+
+        g_generalLogger.log(L"Step 10: Main loop exited, waiting for background threads...");
         if (bgThread.joinable()) bgThread.join();
+        if (antiDebugThread.joinable()) antiDebugThread.join();
 
         g_generalLogger.log(L"Step 11: Performing final cleanup...");
         // Cleanup before exit
         CleanupAndExit();
 
         g_generalLogger.log(L"Step 12: Program completed successfully");
-
-        // [DEBUG] Keep window open at end
-        std::cout << "\nProgram ended. Press Enter to exit.";
-        std::cin.ignore();
-        std::cin.get();
-
         return 0;
     }
     catch (const std::exception& e) {
